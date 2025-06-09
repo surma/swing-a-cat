@@ -9,16 +9,21 @@ const enum KeyEvent {
   DOWN,
 }
 
+function mapKey(key: string): string {
+  if (key == " ") return "Space";
+  if (key.length == 1) return key.toUpperCase();
+  return key;
+}
 export function keyboardTracker(): KeyboardTracker {
   let currentKeys = new Set();
   let previousKeys = new Set();
   let pendingKeys: [string, KeyEvent][] = [];
 
   addEventListener("keydown", (ev) => {
-    pendingKeys.push([ev.key.toUpperCase(), KeyEvent.DOWN]);
+    pendingKeys.push([mapKey(ev.key), KeyEvent.DOWN]);
   });
   addEventListener("keyup", (ev) => {
-    pendingKeys.push([ev.key.toUpperCase(), KeyEvent.UP]);
+    pendingKeys.push([mapKey(ev.key), KeyEvent.UP]);
   });
 
   function isDown(key) {

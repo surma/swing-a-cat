@@ -1,0 +1,20 @@
+{
+  "json": {},
+  "markdown": {},
+  "exec": {
+    "commands": [
+      {
+        "command": "nixfmt",
+        "exts": ["nix"]
+      }
+    ]
+  },
+  "prettier": {},
+  "excludes": ["node_modules/**", "dist/**"],
+  "plugins": [
+    "https://plugins.dprint.dev/json-0.20.0.wasm",
+    "https://plugins.dprint.dev/markdown-0.18.0.wasm",
+    "https://plugins.dprint.dev/prettier-0.57.0.json@1bc6b449e982d5b91a25a7c59894102d40c5748651a08a095fb3926e64d55a31",
+    "https://plugins.dprint.dev/exec-0.5.1.json@492414e39dea4dccc07b4af796d2f4efdb89e84bae2bd4e1e924c0cc050855bf"
+  ]
+}

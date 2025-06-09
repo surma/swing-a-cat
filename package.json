@@ -1,0 +1,16 @@
+{
+  "name": "game",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "Surma <surma@surma.dev>",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}

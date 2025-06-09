@@ -1,4 +1,5 @@
 import { KeyboardTracker } from "./input";
+import { Entity } from "./scene";
 
 export interface Ctx {
   ctx: CanvasRenderingContext2D;
@@ -7,25 +8,3 @@ export interface Ctx {
   scene: Entity;
   frameCount: number;
 }
-
-export interface BaseEntity {
-  type?: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  c?: Entity[];
-  draw?(entity: Entity, ctx: Ctx): void;
-  tick?(entity: Entity, ctx: Ctx): void;
-}
-
-export interface Rope extends BaseEntity {
-  type: "rope";
-  spawnFrame: number;
-}
-
-export interface Player extends BaseEntity {
-  type: "player";
-}
-
-export type Entity = Rope | Player | BaseEntity;

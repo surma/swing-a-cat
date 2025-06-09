@@ -1,7 +1,16 @@
-import { draw, drawPlayer, drawRope } from "./draw";
-import { Ctx, Entity, Rope } from "./game";
+import { RectComponent } from "./components/rect";
+import { positionComponent, PositionComponent } from "./components/position";
+import { draw } from "./draw";
+import { Ctx } from "./game";
 import { keyboardTracker } from "./input";
-import { allEntities as allChildren, removeFromChildren } from "./scene";
+import {
+  addChildren,
+  allEntities,
+  Entity,
+  getComponent,
+  nullEntity,
+  remove,
+} from "./scene";
 
 const WIDTH = 320;
 const HEIGHT = 180;
@@ -12,25 +21,46 @@ cvs.height = HEIGHT;
 const cctx = cvs.getContext("2d")!;
 
 const player: Entity = {
-  x: 0,
-  y: 0,
-  w: 20,
-  h: 20,
-  draw: drawPlayer,
-  tick(entity, ctx) {
-    if (ctx.input.isDown("W")) {
-      entity.y -= 1;
-    }
-    if (ctx.input.isDown("S")) {
-      entity.y += 1;
-    }
-    if (ctx.input.isDown("A")) {
-      entity.x -= 1;
-    }
-    if (ctx.input.isDown("D")) {
-      entity.x += 1;
-    }
-  },
+  children: [],
+  components: [
+    {
+      type: "rect",
+      x: -10,
+      y: -10,
+      w: 20,
+      h: 20,
+    },
+    {
+      type: "sprite",
+      draw(entity, ctx) {
+        const rect = entity.components.find(
+          (t) => t.type == "rect",
+        ) as RectComponent | null;
+        if (!rect) return;
+        ctx.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      },
+    },
+    positionComponent(0, 0),
+    {
+      type: "keyboard",
+      tick(entity, ctx) {
+        const pos = getComponent<PositionComponent>(entity, "position");
+        if (!pos) return;
+        if (ctx.input.isDown("W")) {
+          pos.y -= 1;
+        }
+        if (ctx.input.isDown("S")) {
+          pos.y += 1;
+        }
+        if (ctx.input.isDown("A")) {
+          pos.x -= 1;
+        }
+        if (ctx.input.isDown("D")) {
+          pos.x += 1;
+        }
+      },
+    },
+  ],
 };
 
 const ctx: Ctx = {
@@ -39,11 +69,8 @@ const ctx: Ctx = {
   input: keyboardTracker(),
   player,
   scene: {
-    x: 0,
-    y: 0,
-    w: 0,
-    h: 0,
-    c: [player, { x: 80, y: 80, w: 10, h: 10 }],
+    children: [player],
+    components: [positionComponent(120, 120)],
   },
 };
 
@@ -51,25 +78,27 @@ requestAnimationFrame(function f() {
   ctx.frameCount++;
   ctx.input.update();
 
-  for (const e of allChildren(ctx.scene)) {
-    e.tick?.(e, ctx);
+  for (const e of allEntities(ctx.scene)) {
+    for (const c of e.components) {
+      c.tick?.(e, ctx);
+    }
   }
 
-  if (ctx.input.isDown("Space")) {
-    ctx.scene.c!.push({
-      ...ctx.player,
-      type: "rope",
-      spawnFrame: ctx.frameCount,
-      draw: drawRope,
-      tick(entity, ctx) {
-        const r = entity as Rope;
-        const alive = ctx.frameCount - r.spawnFrame;
-        if (alive > 120) {
-          removeFromChildren(entity, ctx.scene);
-        }
-      },
-    });
-  }
+  // if (ctx.input.isDown("Space")) {
+  //   ctx.scene.c!.push({
+  //     ...ctx.player,
+  //     type: "rope",
+  //     spawnFrame: ctx.frameCount,
+  //     draw: drawRope,
+  //     tick(entity, ctx) {
+  //       const r = entity as Rope;
+  //       const alive = ctx.frameCount - r.spawnFrame;
+  //       if (alive > 120) {
+  //         remove(entity);
+  //       }
+  //     },
+  //   });
+  // }
 
   draw(ctx);
   requestAnimationFrame(f);

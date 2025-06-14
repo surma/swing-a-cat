@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "target": "esnext",
+    // "lib": [],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    // "types": [],
+    "allowJs": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}

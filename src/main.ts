@@ -1,105 +1,85 @@
-import { RectComponent } from "./components/rect";
-import { positionComponent, PositionComponent } from "./components/position";
-import { draw } from "./draw";
-import { Ctx } from "./game";
-import { keyboardTracker } from "./input";
-import {
-  addChildren,
-  allEntities,
-  Entity,
-  getComponent,
-  nullEntity,
-  remove,
-} from "./scene";
+import * as e from "littlejsengine";
+import { vec2 } from "littlejsengine";
+import ldtkFile from "../swingcat-level-playground.ldtk";
+import { LdtkFile } from "../ldtk/ldtk";
+import { hexColor } from "./utils/color";
+import { must } from "./utils/types";
 
-const WIDTH = 320;
-const HEIGHT = 180;
-const { cvs } = document.all as unknown as { cvs: HTMLCanvasElement };
-cvs.style = `aspect-ratio: ${WIDTH / HEIGHT}`;
-cvs.width = WIDTH;
-cvs.height = HEIGHT;
-const cctx = cvs.getContext("2d")!;
+const gridSize = ldtkFile.defaultGridSize;
 
-const player: Entity = {
-  children: [],
-  components: [
-    {
-      type: "rect",
-      x: -10,
-      y: -10,
-      w: 20,
-      h: 20,
-    },
-    {
-      type: "sprite",
-      draw(entity, ctx) {
-        const rect = entity.components.find(
-          (t) => t.type == "rect",
-        ) as RectComponent | null;
-        if (!rect) return;
-        ctx.ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-      },
-    },
-    positionComponent(0, 0),
-    {
-      type: "keyboard",
-      tick(entity, ctx) {
-        const pos = getComponent<PositionComponent>(entity, "position");
-        if (!pos) return;
-        if (ctx.input.isDown("W")) {
-          pos.y -= 1;
-        }
-        if (ctx.input.isDown("S")) {
-          pos.y += 1;
-        }
-        if (ctx.input.isDown("A")) {
-          pos.x -= 1;
-        }
-        if (ctx.input.isDown("D")) {
-          pos.x += 1;
-        }
-      },
-    },
-  ],
-};
+function ldtkLevelLayer(root: LdtkFile, name: string): e.TileLayer {
+  const structureLayerDef = must(
+    root.defs.layers.find((layerDef) => layerDef.identifier == "Structure"),
+  );
+  const level = root.levels.find((level) => level.identifier == name);
+  if (!level) throw Error(`Unknown level ${name}`);
+  const structureLayer = level.layerInstances?.find(
+    (layer) => layer.layerDefUid == structureLayerDef.uid,
+  );
 
-const ctx: Ctx = {
-  ctx: cctx,
-  frameCount: 0,
-  input: keyboardTracker(),
-  player,
-  scene: {
-    children: [player],
-    components: [positionComponent(120, 120)],
-  },
-};
+  const layer = new e.TileLayer(
+    vec2(0, 0),
+    vec2(level.pxWid / gridSize, level.pxHei / gridSize),
+    new e.TileInfo(vec2(0, 0), vec2(gridSize, gridSize)),
+    vec2(1, 1),
+    0,
+  );
 
-requestAnimationFrame(function f() {
-  ctx.frameCount++;
-  ctx.input.update();
-
-  for (const e of allEntities(ctx.scene)) {
-    for (const c of e.components) {
-      c.tick?.(e, ctx);
+  let c = 0;
+  for (let y = layer.size.y - 1; y >= 0; y--) {
+    for (let x = 0; x < layer.size.x; x++, c++) {
+      const data = layer.getData(vec2(x, y));
+      const idx = structureLayer?.intGridCsv[c];
+      // 0 means empty in LDTK
+      if (idx == 0) {
+        // @ts-ignore
+        data.tile = undefined;
+        continue;
+      }
+      const gridValue = must(
+        structureLayerDef.intGridValues.find((v) => v.value == idx),
+      );
+      data.tile = 0;
+      data.color = hexColor(gridValue.color);
     }
   }
+  return layer;
+}
 
-  // if (ctx.input.isDown("Space")) {
-  //   ctx.scene.c!.push({
-  //     ...ctx.player,
-  //     type: "rope",
-  //     spawnFrame: ctx.frameCount,
-  //     draw: drawRope,
-  //     tick(entity, ctx) {
-  //       const r = entity as Rope;
-  //       const alive = ctx.frameCount - r.spawnFrame;
-  //       if (alive > 120) {
-  //         remove(entity);
-  //       }
-  //     },
-  //   });
-  // }
+function gameInit() {
+  e.setCameraScale(8);
+  e.setCanvasFixedSize(vec2(384, 216));
+  e.setCanvasPixelated(true);
+  e.setEnablePhysicsSolver(true);
+  e.setGravity(-10);
+  e.initTileCollision(vec2(gridSize, gridSize));
+  e.setInputWASDEmulateDirection(true);
 
-  draw(ctx);
-  requestAnimationFrame(f);
-});
+  const layer = ldtkLevelLayer(ldtkFile, "Level_1");
+  e.setCameraPos(layer.size.scale(0.5));
+  layer.redraw();
+}
+
+function gameUpdate() {}
+
+function gameUpdatePost() {}
+
+function gameRender() {}
+
+function gameRenderPost() {}
+
+const cvs = new OffscreenCanvas(1, 1);
+const ctx = cvs.getContext("2d")!;
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, 1, 1);
+const emptyTexture = await cvs.convertToBlob({ type: "image/png" });
+const emptyTextureUrl = URL.createObjectURL(emptyTexture);
+const imageSources = [emptyTextureUrl];
+e.engineInit(
+  gameInit,
+  gameUpdate,
+  gameUpdatePost,
+  gameRender,
+  gameRenderPost,
+  imageSources,
+);

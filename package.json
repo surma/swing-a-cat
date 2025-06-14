@@ -2,6 +2,7 @@
   "name": "game",
   "version": "0.0.1",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "vite",
     "build": "vite build"
@@ -11,6 +12,15 @@
   "license": "MIT",
   "description": "",
   "devDependencies": {
-    "vite": "^6.3.5"
+    "@types/node": "^24.0.1",
+    "@vitest/browser": "^3.2.3",
+    "jsdom": "^26.1.0",
+    "playwright": "^1.53.0",
+    "vitest": "^3.2.3"
+  },
+  "dependencies": {
+    "littlejsengine": "^1.11.8",
+    "vite": "^6.3.5",
+    "terser": "^5.42.0"
   }
 }

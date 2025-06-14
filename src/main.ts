@@ -1,63 +1,48 @@
 import * as e from "littlejsengine";
-import { vec2 } from "littlejsengine";
-import ldtkFile from "../swingcat-level-playground.ldtk";
-import { LdtkFile } from "../ldtk/ldtk";
-import { hexColor } from "./utils/color";
-import { must } from "./utils/types";
-
-const gridSize = ldtkFile.defaultGridSize;
-
-function ldtkLevelLayer(root: LdtkFile, name: string): e.TileLayer {
-  const structureLayerDef = must(
-    root.defs.layers.find((layerDef) => layerDef.identifier == "Structure"),
-  );
-  const level = root.levels.find((level) => level.identifier == name);
-  if (!level) throw Error(`Unknown level ${name}`);
-  const structureLayer = level.layerInstances?.find(
-    (layer) => layer.layerDefUid == structureLayerDef.uid,
-  );
-
-  const layer = new e.TileLayer(
-    vec2(0, 0),
-    vec2(level.pxWid / gridSize, level.pxHei / gridSize),
-    new e.TileInfo(vec2(0, 0), vec2(gridSize, gridSize)),
-    vec2(1, 1),
-    0,
-  );
-
-  let c = 0;
-  for (let y = layer.size.y - 1; y >= 0; y--) {
-    for (let x = 0; x < layer.size.x; x++, c++) {
-      const data = layer.getData(vec2(x, y));
-      const idx = structureLayer?.intGridCsv[c];
-      // 0 means empty in LDTK
-      if (idx == 0) {
-        // @ts-ignore
-        data.tile = undefined;
-        continue;
-      }
-      const gridValue = must(
-        structureLayerDef.intGridValues.find((v) => v.value == idx),
-      );
-      data.tile = 0;
-      data.color = hexColor(gridValue.color);
-    }
-  }
-  return layer;
-}
+import { vec2, PI, tile, hsl } from "littlejsengine";
+import { ldtkLevel } from "./utils/ldtk";
 
 function gameInit() {
   e.setCameraScale(8);
   e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
   e.setEnablePhysicsSolver(true);
-  e.setGravity(-10);
-  e.initTileCollision(vec2(gridSize, gridSize));
+  e.setGravity(-0.01);
   e.setInputWASDEmulateDirection(true);
+  e.initTileCollision(vec2(32, 32));
 
-  const layer = ldtkLevelLayer(ldtkFile, "Level_1");
+  const { layer, spawnPos } = ldtkLevel("Level_1");
   e.setCameraPos(layer.size.scale(0.5));
   layer.redraw();
+
+  const particleEmitter = new e.ParticleEmitter(
+    spawnPos.add(vec2(2.5, 3.5)),
+    0, // emitPos, emitAngle
+    0,
+    0,
+    500,
+    PI, // emitSize, emitTime, emitRate, emitCone
+    tile(0, 16), // tileIndex, tileSize
+    hsl(0, 1, 0.5),
+    hsl(2 / 3, 1, 0.5), // colorStartA, colorStartB
+    hsl(0, 0, 0, 0),
+    hsl(0, 0, 0, 0), // colorEndA, colorEndB
+    2,
+    0.2,
+    0.2,
+    0.1,
+    0.05, // time, sizeStart, sizeEnd, speed, angleSpeed
+    0.99,
+    1,
+    1,
+    PI, // damping, angleDamping, gravityScale, cone
+    0.05,
+    0.5,
+    true,
+    true, // fadeRate, randomness, collide, additive
+  );
+  particleEmitter.elasticity = 0.3; // bounce when it collides
+  particleEmitter.trailScale = 2; // stretch in direction of motion
 }
 
 function gameUpdate() {}

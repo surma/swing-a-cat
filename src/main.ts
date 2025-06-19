@@ -1,6 +1,19 @@
 import * as e from "littlejsengine";
 import { vec2, PI, tile, hsl } from "littlejsengine";
-import { ldtkLevel } from "./utils/ldtk";
+import { ldtkLevel, gridSize } from "./utils/ldtk";
+
+class Player extends e.EngineObject {
+  speed: number = 3;
+  constructor(pos: e.Vector2) {
+    super(pos);
+    this.size = vec2(1, 1);
+    this.color = hsl(0.5, 1, 0.5);
+    this.collideTiles = true;
+    this.collideSolidObjects = true;
+  }
+}
+
+const p = new Player(vec2(4, 10));
 
 function gameInit() {
   e.setCameraScale(8);
@@ -47,7 +60,17 @@ function gameInit() {
 
 function gameUpdate() {}
 
-function gameUpdatePost() {}
+function gameUpdatePost() {
+  if (e.keyIsDown("KeyD")) {
+    p.pos.x += e.timeDelta * p.speed;
+  }
+  if (e.keyIsDown("KeyA")) {
+    p.pos.x -= e.timeDelta * p.speed;
+  }
+  if (e.keyWasPressed("Space")) {
+    p.applyAcceleration(vec2(0, 0.3));
+  }
+}
 
 function gameRender() {}
 

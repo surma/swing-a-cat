@@ -1,21 +1,65 @@
 import * as e from "littlejsengine";
 import { vec2, PI, tile, hsl } from "littlejsengine";
-import { ldtkLevel, gridSize, textures } from "./utils/ldtk";
+import {
+  ldtkLevel,
+  gridSize,
+  textures,
+  getTilesetTextureIndex,
+} from "./utils/ldtk";
 import ldtkFile from "../swingcat-level-playground.ldtk";
 
 class Player extends e.EngineObject {
   speed: number = 0.09;
   constructor(pos: e.Vector2) {
     super(pos);
-    this.size = vec2(2, 1);
-    this.color = hsl(0.5, 1, 0.5);
+    this.size = vec2(1, 1);
+
+    // Get Cat tileset texture index and create tile reference
+    const catTextureIndex = getTilesetTextureIndex("Cat");
+    this.tileInfo = tile(0, vec2(gridSize), catTextureIndex);
+
     this.collideTiles = true;
     // this.collideSolidObjects = true;
     this.collideRaycast = false;
+
+    const particleEmitter = new e.ParticleEmitter(
+      vec2(0, 0), // emitPos,
+      0, //emitAngle
+      0, // size
+      0, // time
+      5000, // rate
+      0.5, // cone
+      tile(0, 16), // tileIndex, tileSize
+      hsl(0, 1, 0.5),
+      hsl(2 / 3, 1, 0.5), // colorStartA, colorStartB
+      hsl(0, 0, 0, 0),
+      hsl(0, 0, 0, 0), // colorEndA, colorEndB
+      2, //time
+      0.2, // size start
+      0.2, // size end
+      0.1, // speed
+      0.05, // angleSpeed
+      0.99, // damping
+      1, // angle damping
+      0, // gravity scle
+      PI, //cone
+      0.05, // fade rate
+      0.5, // randmness
+      true, // collide
+      true, //  additive
+    );
+    particleEmitter.elasticity = 0.3; // bounce when it collides
+    particleEmitter.trailScale = 2; // stretch in direction of motion
+
+    this.addChild(particleEmitter, vec2(-0.4, 0), -PI / 2);
   }
+
+  // update(): void {
+
+  // }
 }
 
-const p = new Player(vec2(4, 10));
+let p: Player;
 
 function gameInit() {
   e.setCameraScale(gridSize * 3);
@@ -32,34 +76,8 @@ function gameInit() {
   e.setCameraPos(layer.size.scale(0.5));
   layer.redraw();
 
-  const particleEmitter = new e.ParticleEmitter(
-    spawnPos.add(vec2(2.5, 3.5)),
-    0, // emitPos, emitAngle
-    0,
-    0,
-    500,
-    PI, // emitSize, emitTime, emitRate, emitCone
-    tile(0, 16), // tileIndex, tileSize
-    hsl(0, 1, 0.5),
-    hsl(2 / 3, 1, 0.5), // colorStartA, colorStartB
-    hsl(0, 0, 0, 0),
-    hsl(0, 0, 0, 0), // colorEndA, colorEndB
-    2,
-    0.2,
-    0.2,
-    0.1,
-    0.05, // time, sizeStart, sizeEnd, speed, angleSpeed
-    0.99,
-    1,
-    1,
-    PI, // damping, angleDamping, gravityScale, cone
-    0.05,
-    0.5,
-    true,
-    true, // fadeRate, randomness, collide, additive
-  );
-  particleEmitter.elasticity = 0.3; // bounce when it collides
-  particleEmitter.trailScale = 2; // stretch in direction of motion
+  p = new Player(vec2(4, 10));
+  p.pos = vec2(spawnPos);
 }
 
 function gameUpdate() {}

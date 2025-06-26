@@ -44,6 +44,22 @@ export function getTileset(tilesetUid: number) {
   return tileset;
 }
 
+export function getTilesetByName(name: string) {
+  const tileset = ldtkFile.defs.tilesets.find(
+    (tileset) => tileset.identifier === name,
+  );
+  if (!tileset) throw Error(`Unknown tileset ${name}`);
+  return tileset;
+}
+
+export function getTilesetTextureIndex(tilesetName: string): number {
+  const tileset = getTilesetByName(tilesetName);
+  const textureIndex = textures.indexOf(tileset.relPath);
+  if (textureIndex === -1)
+    throw Error(`Texture not found for tileset ${tilesetName}`);
+  return textureIndex;
+}
+
 export function getEntityFromLayer(layer: LayerInstance, entityName: string) {
   const entityUid = entityDefs[entityName]?.uid;
   if (!entityUid) throw Error(`Unknown entity ${entityName}`);

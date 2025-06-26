@@ -6,17 +6,38 @@ import {
   textures,
   getTilesetTextureIndex,
 } from "./utils/ldtk";
-import ldtkFile from "../swingcat-level-playground.ldtk";
+
 
 class Player extends e.EngineObject {
   speed: number = 0.09;
+  lastPos: [e.Vector2, e.Vector2];
+
+  shouldMirror() {
+    const [prev, now] = this.lastPos;
+    return Math.sign(now.subtract(prev).x);
+  }
+
+  updateLastPos() {
+    const [p1, p2] = this.lastPos;
+    this.lastPos = [p2, this.pos.copy()];
+  }
+
+  updateMirror() {
+    const oldMirror = this.shouldMirror();
+    this.updateLastPos();
+    const newMirror = this.shouldMirror();
+    if (newMirror === 0) return;
+    this.mirror = newMirror == -1;
+  }
+
   constructor(pos: e.Vector2) {
     super(pos);
+    this.lastPos = [pos.copy(), pos.copy()];
     this.size = vec2(1, 1);
 
     // Get Cat tileset texture index and create tile reference
     const catTextureIndex = getTilesetTextureIndex("Cat");
-    this.tileInfo = tile(0, vec2(gridSize), catTextureIndex);
+    this.tileInfo = tile(0, vec2(gridSize), catTextureIndex, 1);
 
     this.collideTiles = true;
     // this.collideSolidObjects = true;
@@ -51,12 +72,13 @@ class Player extends e.EngineObject {
     particleEmitter.elasticity = 0.3; // bounce when it collides
     particleEmitter.trailScale = 2; // stretch in direction of motion
 
-    this.addChild(particleEmitter, vec2(-0.4, 0), -PI / 2);
+    this.addChild(particleEmitter, vec2(-0.5, -0.2), -PI / 2);
   }
 
-  // update(): void {
-
-  // }
+  update(): void {
+    super.update();
+    this.updateMirror();
+  }
 }
 
 let p: Player;

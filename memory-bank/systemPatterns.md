@@ -177,3 +177,18 @@ const { layer, spawnPos } = ldtkLevel("Level_1");
 e.setCameraPos(layer.size.scale(0.5));  // Center camera on level
 layer.redraw();                          // Refresh level rendering
 ```
+
+### LDTK Texture Loading Pattern
+```typescript
+// Vite plugin automatically processes LDTK files:
+// 1. Discovers texture files from tileset definitions
+// 2. Generates import statements for each texture
+// 3. Replaces file paths with Vite-processed URLs
+
+// Before (raw LDTK):
+// "relPath": "tileset-test-2.png"
+
+// After (processed by plugin):
+// import texture_0 from "./tileset-test-2.png";
+// "relPath": texture_0  // Now contains optimized Vite URL
+```

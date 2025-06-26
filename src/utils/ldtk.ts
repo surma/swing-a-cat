@@ -42,14 +42,15 @@ export function getEntityFromLayer(layer: LayerInstance, entityName: string) {
 
 export function ldtkLevel(name: string) {
   const level = getLevel(name);
+  const numTiles = vec2(level.pxWid, level.pxHei).divide(vec2(gridSize));
   const structureLayer = getLayerFromLevel(level, "Structure");
   const entitiesLayer = getLayerFromLevel(level, "Entities");
   const spawn = getEntityFromLayer(entitiesLayer, "Spawn");
 
   const layer = new e.TileLayer(
     vec2(0, 0),
-    vec2(level.pxWid / gridSize, level.pxHei / gridSize),
-    new e.TileInfo(vec2(0, 0), vec2(gridSize, gridSize)),
+    numTiles,
+    new e.TileInfo(vec2(0), vec2(1)),
     vec2(1, 1),
     0,
   );

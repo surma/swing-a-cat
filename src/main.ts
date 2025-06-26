@@ -9,22 +9,25 @@ class Player extends e.EngineObject {
     this.size = vec2(1, 1);
     this.color = hsl(0.5, 1, 0.5);
     this.collideTiles = true;
-    this.collideSolidObjects = true;
+    // this.collideSolidObjects = true;
+    this.collideRaycast = false;
   }
 }
 
 const p = new Player(vec2(4, 10));
 
 function gameInit() {
-  e.setCameraScale(8);
-  e.setCanvasFixedSize(vec2(384, 216));
+  e.setCameraScale(gridSize*2);
+  // e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
-  e.setEnablePhysicsSolver(true);
+  // e.setEnablePhysicsSolver(true);
   e.setGravity(-0.01);
   e.setInputWASDEmulateDirection(true);
   e.initTileCollision(vec2(32, 32));
 
   const { layer, spawnPos } = ldtkLevel("Level_1");
+  // layer.size = layer.size.multiply(vec2(8));
+  // layer.scale = layer.scale.multiply(vec2(8));
   e.setCameraPos(layer.size.scale(0.5));
   layer.redraw();
 
@@ -61,20 +64,41 @@ function gameInit() {
 function gameUpdate() {}
 
 function gameUpdatePost() {
-  if (e.keyIsDown("KeyD")) {
+  if (e.keyIsDown("ArrowRight")) {
     p.pos.x += e.timeDelta * p.speed;
   }
-  if (e.keyIsDown("KeyA")) {
+  if (e.keyIsDown("ArrowLeft")) {
     p.pos.x -= e.timeDelta * p.speed;
   }
   if (e.keyWasPressed("Space")) {
     p.applyAcceleration(vec2(0, 0.3));
   }
+  // console.log(p.pos);
 }
 
-function gameRender() {}
+function gameRender() {
+  for(let y = 0; y < 10; y++) {
+    for(let x = 0; x < 10; x++) {
+      
+       e.drawRect(vec2(x, y), vec2(1/8, 1/8), hsl(5/6, 1, .5));
+    }
+  }
+  e.drawLine(vec2(0, 0), vec2(1, 1), .1, hsl(.5, 1, .5));
+  e.drawLine(vec2(0, 1), vec2(1, 0), .1, hsl(.5, 1, .5));
+  // const ctx = e.mainContext;
+  // ctx.imageSmoothingEnabled = false;
+  // ctx.save();
+  // ctx.strokeStyle = 'green';
+  // ctx.beginPath();
+  // ctx.moveTo(1, 1);
+  // ctx.lineTo(2, 2);
+  // ctx.stroke();
+  // ctx.restore();
+}
 
-function gameRenderPost() {}
+function gameRenderPost() {
+ 
+}
 
 const cvs = new OffscreenCanvas(1, 1);
 const ctx = cvs.getContext("2d")!;

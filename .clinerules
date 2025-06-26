@@ -1,0 +1,124 @@
+# To Swing a Cat - Project Intelligence
+
+## Project Context
+js13k contest game - "To Swing a Cat" - pixel art platformer with tail-based swinging mechanics and progression system.
+
+## Critical Implementation Paths
+
+### LittleJS Engine Patterns
+- Always use `vec2()` for Vector2 creation, not `new Vector2()`
+- HSL colors via `hsl(h, s, l, a?)` - more intuitive than RGB for game graphics
+- Physics: `applyAcceleration()` for impulses, direct position manipulation for continuous movement
+- Rendering: `gameRender()` for background, `gameRenderPost()` for UI/overlays
+- Input: `keyIsDown()` for continuous, `keyWasPressed()` for discrete events
+
+### Size Optimization Strategies
+- Procedural texture generation using OffscreenCanvas (see main.ts example)
+- HSL color system reduces need for sprite assets
+- LittleJS provides most functionality - avoid reinventing
+- Terser + Vite tree-shaking handles most optimization automatically
+
+### LDTK Integration Notes
+- `ldtkLevel()` function returns `{ layer, spawnPos }`
+- Must call `layer.redraw()` after loading
+- Camera positioning: `setCameraPos(layer.size.scale(0.5))` centers on level
+- Grid-based coordinate system with configurable `gridSize`
+
+## User Preferences & Workflow
+
+### Development Approach
+- Memory bank documentation is critical - always maintain after significant changes
+- TypeScript strict mode preferred for type safety
+- Pixel-perfect rendering essential for aesthetic
+- Performance target: 60fps on modern browsers
+
+### Code Organization Preferences
+- Separate concerns: utils for reusable functions, main.ts for game logic
+- Component-based architecture using EngineObject inheritance
+- Clear separation between game phases (init, update, render)
+
+## Project-Specific Patterns
+
+### Physics Configuration
+```typescript
+// Established working values
+setGravity(-0.01);           // Light gravity for platformer feel
+setCameraScale(gridSize*2);  // Pixel-perfect scaling
+setCanvasPixelated(true);    // Crisp pixel art
+```
+
+### Entity Creation Pattern
+```typescript
+class GameEntity extends EngineObject {
+  constructor(pos: Vector2) {
+    super(pos);
+    this.size = vec2(1, 1);
+    this.color = hsl(h, s, l);
+    this.collideTiles = true;
+  }
+}
+```
+
+### Level Loading Pattern
+```typescript
+const { layer, spawnPos } = ldtkLevel("Level_Name");
+setCameraPos(layer.size.scale(0.5));
+layer.redraw();
+// Use spawnPos for player positioning
+```
+
+## Known Challenges & Solutions
+
+### LDTK Integration
+- Level loading works but may need refinement for complex levels
+- Spawn points and entity placement need custom handling
+- Consider simplifying level format if size becomes constraint
+
+### Audio Integration Strategy
+- SoundBox: Generate music at build time, embed as data
+- zzfx: Runtime sound generation for effects
+- Web Audio API: Single context, careful resource management
+
+### Swinging Mechanics Design
+- Physics-based vs simplified arc movement (decision pending)
+- Anchor point detection system needed
+- Momentum preservation critical for feel
+
+## Evolution of Project Decisions
+
+### Initial Setup (Complete)
+- Chose LittleJS for lightweight engine with good feature set
+- TypeScript for development safety and modern features
+- Vite for fast development and optimized builds
+- LDTK for visual level editing
+
+### Next Phase Decisions (Pending)
+- Swinging control scheme: mouse vs keyboard-only
+- Progression system: 3-5 tails with specific abilities each
+- Level complexity: balance scope with 13KB limit
+
+## Tool Usage Patterns
+
+### Development Workflow
+1. `npm start` for development server with hot reload
+2. `npm run build` for production testing
+3. Memory bank updates after major feature additions
+4. Regular size budget checks during development
+
+### Testing Strategy
+- Browser-based testing with Vitest
+- Manual gameplay testing for feel and balance
+- Size constraint validation before major commits
+
+## Critical Success Factors
+1. Swinging mechanics must feel satisfying and responsive
+2. Progression system must be clear and rewarding
+3. Audio must enhance the experience within size budget
+4. Pixel art style must be consistent and appealing
+5. 13KB limit compliance without sacrificing core experience
+
+## Memory Bank Maintenance
+- Update activeContext.md when changing focus areas
+- Update progress.md after completing major features
+- Update systemPatterns.md when establishing new architectural patterns
+- Full memory bank review when user requests "update memory bank"

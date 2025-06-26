@@ -103,7 +103,7 @@
 			"uiFilterTags": [],
 			"useAsyncRender": false,
 			"intGridValues": [
-				{ "value": 1, "identifier": "Wall", "color": "#B86F50", "tile": null, "groupUid": 0 },
+				{ "value": 1, "identifier": "Wall", "color": "#D77643", "tile": null, "groupUid": 0 },
 				{ "value": 2, "identifier": "Water", "color": "#5E6BFF", "tile": null, "groupUid": 0 }
 			],
 			"intGridValuesGroups": [],
@@ -586,7 +586,7 @@
 			"__cHei": 3,
 			"identifier": "Grass",
 			"uid": 114,
-			"relPath": "../../Downloads/tileset-test-2.png",
+			"relPath": "tileset-test-2.png",
 			"embedAtlas": null,
 			"pxWid": 40,
 			"pxHei": 24,
@@ -673,7 +673,7 @@
 					"__pxTotalOffsetX": 0,
 					"__pxTotalOffsetY": 0,
 					"__tilesetDefUid": 114,
-					"__tilesetRelPath": "../../Downloads/tileset-test-2.png",
+					"__tilesetRelPath": "tileset-test-2.png",
 					"iid": "a2a53701-66b0-11ec-9cd7-43934582bcfa",
 					"levelId": 70,
 					"layerDefUid": 72,

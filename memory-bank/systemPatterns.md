@@ -192,3 +192,37 @@ layer.redraw();                          // Refresh level rendering
 // import texture_0 from "./tileset-test-2.png";
 // "relPath": texture_0  // Now contains optimized Vite URL
 ```
+
+### Texture Rendering Integration
+```typescript
+// Export textures from LDTK utilities
+export const textures: Maybe<string>[] = ldtkFile.defs.tilesets.map(
+  (t) => t.relPath,
+);
+
+// Use textures in LittleJS initialization
+e.engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, textures);
+
+// Auto-layer tile rendering with actual textures
+const textureIndex = textures.indexOf(structureTileset.relPath);
+const layer = new e.TileLayer(
+  vec2(0, 0),
+  numTiles,
+  new e.TileInfo(vec2(0), vec2(gridSize), textureIndex),
+  vec2(1, 1),
+  0,
+);
+
+// Calculate tile coordinates from LDTK auto-layer data
+const tileX = Math.floor(srcX / gridSize);
+const tileY = Math.floor(srcY / gridSize);
+const tileIndex = tileY * tileset.__cWid + tileX;
+data.tile = tileIndex;
+```
+
+### LDTK Integration Improvements
+- **Texture Pipeline**: Complete integration from LDTK → Vite plugin → LittleJS rendering
+- **Auto-layer Support**: Processes LDTK auto-layer tiles with actual texture coordinates
+- **Tileset Management**: Improved utility functions for tileset and layer access
+- **Error Handling**: Better validation and error messages for missing resources
+- **Type Safety**: Enhanced type definitions and null checking

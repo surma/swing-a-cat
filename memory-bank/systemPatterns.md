@@ -24,9 +24,14 @@ The LittleJS engine provides a clear separation of concerns:
 ### Component-Based Architecture
 ```typescript
 class Player extends EngineObject {
-  speed: number = 3;
-  // Physics properties inherited from EngineObject
-  // Rendering properties inherited from EngineObject
+  speed: number = 0.03;  // Actual value from implementation
+  constructor(pos: Vector2) {
+    super(pos);
+    this.size = vec2(1, 1);
+    this.color = hsl(0.5, 1, 0.5);  // Cyan color
+    this.collideTiles = true;
+    this.collideRaycast = false;
+  }
 }
 ```
 
@@ -62,9 +67,10 @@ layer.redraw();
   - Manual acceleration via `applyAcceleration()`
 
 ### Movement Mechanics
-- **Horizontal**: Direct position manipulation with speed * timeDelta
-- **Vertical**: Physics-based with gravity and acceleration
+- **Horizontal**: Direct velocity manipulation `p.velocity.x = p.speed` (0.03 units/frame)
+- **Vertical**: Physics-based with gravity (-0.01) and acceleration
 - **Jump**: Impulse-based using `applyAcceleration(vec2(0, 0.3))`
+- **Input Reset**: Velocity.x reset to 0 each frame, then set based on input
 
 ## Rendering System
 
@@ -77,9 +83,13 @@ layer.redraw();
   3. UI/effects in `gameRenderPost()`
 
 ### Current Rendering Elements
-- **Debug Grid**: 10x10 purple rectangles for spatial reference
-- **Debug Lines**: Diagonal lines for coordinate verification
-- **Particles**: Emitter system with physics and collision
+- **Debug Grid**: 10x10 purple rectangles (hsl(5/6, 1, .5)) with size vec2(1/8, 1/8)
+- **Debug Lines**: Two diagonal lines (cyan, hsl(.5, 1, .5)) from (0,0)→(1,1) and (0,1)→(1,0)
+- **Particles**: Complex emitter at spawnPos + vec2(2.5, 3.5) with:
+  - Red to blue color transition (hsl(0,1,0.5) → hsl(2/3,1,0.5))
+  - Physics collision with elasticity 0.3
+  - Trail scaling factor of 2
+  - 500ms emit rate with PI cone spread
 
 ## Data Management
 
@@ -89,9 +99,10 @@ LDTK File → ldtkLevel() → { layer, spawnPos } → Game World
 ```
 
 ### Asset Management
-- **Procedural Textures**: OffscreenCanvas for generating simple textures
-- **Minimal Assets**: Single empty texture as base
-- **Color-Based Graphics**: Rely on HSL colors rather than sprites
+- **Procedural Textures**: OffscreenCanvas(1,1) generates white pixel texture
+- **Minimal Assets**: Single empty texture converted to blob and object URL
+- **Color-Based Graphics**: HSL color system throughout (player, particles, debug elements)
+- **Texture Pipeline**: `cvs.convertToBlob({type: "image/png"})` → `URL.createObjectURL()`
 
 ## Planned Patterns
 
@@ -132,5 +143,37 @@ interface Ability {
 
 ## Error Handling
 - **Graceful Degradation**: Game continues even if optional features fail
-- **Development Aids**: Console logging for debugging (to be removed in production)
-- **Asset Fallbacks**: Default textures if generation fails
+- **Development Aids**: Debug rendering in gameRender() (to be removed in production)
+- **Asset Fallbacks**: Single white pixel texture as base case
+- **Type Safety**: Non-null assertion on canvas context (`getContext("2d")!`)
+
+## Current Implementation Patterns
+
+### Engine Initialization Pattern
+```typescript
+const imageSources = [emptyTextureUrl];
+e.engineInit(
+  gameInit,      // Setup function
+  gameUpdate,    // Core logic (currently empty)
+  gameUpdatePost,// Input and physics
+  gameRender,    // Custom drawing
+  gameRenderPost,// UI overlay (currently empty)
+  imageSources   // Texture array
+);
+```
+
+### Physics Configuration Pattern
+```typescript
+e.setCameraScale(gridSize*2);        // Pixel-perfect scaling
+e.setCanvasPixelated(true);          // Crisp pixel rendering
+e.setGravity(-0.01);                 // Light platformer gravity
+e.setInputWASDEmulateDirection(true); // Alternative controls
+e.initTileCollision(vec2(32, 32));   // Grid-based collision
+```
+
+### Level Loading Pattern
+```typescript
+const { layer, spawnPos } = ldtkLevel("Level_1");
+e.setCameraPos(layer.size.scale(0.5));  // Center camera on level
+layer.redraw();                          // Refresh level rendering
+```

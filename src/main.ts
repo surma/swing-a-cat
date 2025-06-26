@@ -3,7 +3,7 @@ import { vec2, PI, tile, hsl } from "littlejsengine";
 import { ldtkLevel, gridSize } from "./utils/ldtk";
 
 class Player extends e.EngineObject {
-  speed: number = 3;
+  speed: number = .03;
   constructor(pos: e.Vector2) {
     super(pos);
     this.size = vec2(1, 1);
@@ -64,22 +64,24 @@ function gameInit() {
 function gameUpdate() {}
 
 function gameUpdatePost() {
+  p.velocity.x = 0;
+
   if (e.keyIsDown("ArrowRight")) {
-    p.pos.x += e.timeDelta * p.speed;
+    p.velocity.x = p.speed;
   }
   if (e.keyIsDown("ArrowLeft")) {
-    p.pos.x -= e.timeDelta * p.speed;
+    p.velocity.x = -p.speed;
   }
+
   if (e.keyWasPressed("Space")) {
     p.applyAcceleration(vec2(0, 0.3));
   }
-  // console.log(p.pos);
 }
 
 function gameRender() {
   for(let y = 0; y < 10; y++) {
     for(let x = 0; x < 10; x++) {
-      
+
        e.drawRect(vec2(x, y), vec2(1/8, 1/8), hsl(5/6, 1, .5));
     }
   }
@@ -97,7 +99,7 @@ function gameRender() {
 }
 
 function gameRenderPost() {
- 
+
 }
 
 const cvs = new OffscreenCanvas(1, 1);

@@ -1,22 +1,24 @@
 # Active Context: To Swing a Cat
 
 ## Current Work Focus
-Building the foundational memory bank for the js13k game "To Swing a Cat". The project has a basic LittleJS setup with a simple player character, but needs the core swinging mechanics and tail collection system implemented.
+The project has a solid foundation with LittleJS engine integration and basic player mechanics. Current focus should be on implementing the core swinging mechanics and tail collection system. The codebase shows a working player with physics, level loading, and particle effects.
 
 ## Recent Changes
-- Created complete memory bank structure with all core files
-- Analyzed existing codebase to understand current implementation
-- Documented technical architecture and patterns in use
+- Analyzed current main.ts implementation in detail
+- Identified specific technical patterns and configurations in use
+- Updated memory bank to reflect actual code state
+- Documented current player physics values and rendering setup
 
 ## Current State Analysis
 
 ### What's Working
-- **Engine Setup**: LittleJS properly initialized with TypeScript
-- **Basic Player**: Simple player object with movement and physics
-- **Level System**: LDTK integration partially functional
-- **Rendering**: Pixelated canvas with HSL color system
-- **Input**: Arrow key movement and space bar jumping
-- **Physics**: Gravity and collision detection configured
+- **Engine Setup**: LittleJS properly initialized with TypeScript and OffscreenCanvas texture generation
+- **Basic Player**: Player class with speed=0.03, cyan color (hsl(0.5,1,0.5)), size 1x1 unit
+- **Level System**: LDTK integration functional - loads "Level_1", positions camera, redraws layer
+- **Rendering**: Pixelated canvas with HSL color system, debug grid (10x10 purple rectangles), debug lines
+- **Input**: Arrow key movement (0.03 speed) and space bar jumping (0.3 acceleration)
+- **Physics**: Gravity -0.01, tile collision enabled (32x32 tiles), WASD emulation enabled
+- **Particles**: Complex particle emitter at spawn point with physics, collision, and trail effects
 
 ### What's Missing (Core Features)
 1. **Swinging Mechanics**: No tail-based swinging implemented
@@ -27,10 +29,12 @@ Building the foundational memory bank for the js13k game "To Swing a Cat". The p
 6. **Cat Character**: Player is just a colored rectangle
 
 ### Current Technical Debt
-- Debug rendering code cluttering main.ts
-- No proper game state management
-- Missing type definitions for game-specific objects
-- No audio system architecture
+- Debug rendering code in gameRender() (10x10 grid + diagonal lines) should be removed
+- Commented-out code blocks need cleanup (canvas size, physics solver, layer scaling)
+- Player instantiated globally (const p) rather than in proper game state
+- No proper game state management or scene system
+- Missing type definitions for game-specific objects (tail collectibles, abilities)
+- No audio system architecture (SoundBox/zzfx not integrated)
 
 ## Next Steps (Priority Order)
 
@@ -55,16 +59,18 @@ Building the foundational memory bank for the js13k game "To Swing a Cat". The p
 ## Active Decisions & Considerations
 
 ### Swinging Mechanics Design
-- **Anchor System**: Use level geometry or special anchor points?
-- **Physics Model**: Rope physics vs simplified arc movement?
-- **Control Scheme**: Mouse for aim or keyboard-only?
+- **Anchor System**: Use level geometry or special anchor points in LDTK levels?
+- **Physics Model**: Rope physics vs simplified arc movement? (Current physics: gravity -0.01, light feel)
+- **Control Scheme**: Mouse for aim or keyboard-only? (Currently arrow keys + space)
+- **Integration**: How to connect with existing Player class and physics system?
 
 ### Progression System
 - **Tail Count**: How many tails total? (Suggest 3-5 for scope)
 - **Abilities**: What specific abilities per tail?
-  - Tail 1: Basic swinging
+  - Tail 1: Basic swinging (starting ability)
   - Tail 2: Longer reach or double swing?
   - Tail 3: Wall climbing or dash ability?
+- **Visual Feedback**: How to show tail count and abilities in minimal UI?
 
 ### Technical Architecture
 - **State Management**: Simple global state vs proper state machine?
@@ -72,9 +78,11 @@ Building the foundational memory bank for the js13k game "To Swing a Cat". The p
 - **Level Format**: Continue with LDTK or simplify for size constraints?
 
 ## Blockers & Questions
-- Need to understand LDTK integration better (currently partially working)
-- Audio library integration strategy needs clarification
+- LDTK integration appears functional but needs testing with more complex levels
+- Audio library integration strategy needs clarification (SoundBox + zzfx)
 - Size budget allocation between code, audio, and level data
+- Should debug rendering be removed before implementing core mechanics?
+- How to transition from current simple movement to swinging-based movement?
 
 ## Development Environment Notes
 - Vite dev server working correctly

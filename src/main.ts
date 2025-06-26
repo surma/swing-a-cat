@@ -1,9 +1,10 @@
 import * as e from "littlejsengine";
 import { vec2, PI, tile, hsl } from "littlejsengine";
-import { ldtkLevel, gridSize } from "./utils/ldtk";
+import { ldtkLevel, gridSize, textures } from "./utils/ldtk";
+import ldtkFile from "../swingcat-level-playground.ldtk";
 
 class Player extends e.EngineObject {
-  speed: number = .03;
+  speed: number = .09;
   constructor(pos: e.Vector2) {
     super(pos);
     this.size = vec2(2, 1);
@@ -17,7 +18,7 @@ class Player extends e.EngineObject {
 const p = new Player(vec2(4, 10));
 
 function gameInit() {
-  e.setCameraScale(gridSize*2);
+  e.setCameraScale(gridSize*3);
   // e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
   // e.setEnablePhysicsSolver(true);
@@ -79,41 +80,19 @@ function gameUpdatePost() {
 }
 
 function gameRender() {
-  for(let y = 0; y < 10; y++) {
-    for(let x = 0; x < 10; x++) {
 
-       e.drawRect(vec2(x, y), vec2(1/8, 1/8), hsl(5/6, 1, .5));
-    }
-  }
-  e.drawLine(vec2(0, 0), vec2(1, 1), .1, hsl(.5, 1, .5));
-  e.drawLine(vec2(0, 1), vec2(1, 0), .1, hsl(.5, 1, .5));
-  // const ctx = e.mainContext;
-  // ctx.imageSmoothingEnabled = false;
-  // ctx.save();
-  // ctx.strokeStyle = 'green';
-  // ctx.beginPath();
-  // ctx.moveTo(1, 1);
-  // ctx.lineTo(2, 2);
-  // ctx.stroke();
-  // ctx.restore();
 }
 
 function gameRenderPost() {
 
 }
 
-const cvs = new OffscreenCanvas(1, 1);
-const ctx = cvs.getContext("2d")!;
-ctx.fillStyle = "white";
-ctx.fillRect(0, 0, 1, 1);
-const emptyTexture = await cvs.convertToBlob({ type: "image/png" });
-const emptyTextureUrl = URL.createObjectURL(emptyTexture);
-const imageSources = [emptyTextureUrl];
+
 e.engineInit(
   gameInit,
   gameUpdate,
   gameUpdatePost,
   gameRender,
   gameRenderPost,
-  imageSources,
+  textures,
 );

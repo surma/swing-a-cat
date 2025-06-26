@@ -15,11 +15,11 @@ function processTextures(content: types.LdtkFile): string[] {
     if (!tileset.relPath) {
       console.log("Unhandled tileset type");
       continue;
-    } else {
-      textures.add(`./${tileset.relPath}`);
     }
+    const texturePath = `./${tileset.relPath}`;
+    textures.add(texturePath);
 
-    const id = Array.from(textures).indexOf(tileset.relPath);
+    const id = Array.from(textures).indexOf(texturePath);
     tileset.relPath = texturePlaceholder(id);
   }
 

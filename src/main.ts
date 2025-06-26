@@ -4,7 +4,7 @@ import { ldtkLevel, gridSize, textures } from "./utils/ldtk";
 import ldtkFile from "../swingcat-level-playground.ldtk";
 
 class Player extends e.EngineObject {
-  speed: number = .09;
+  speed: number = 0.09;
   constructor(pos: e.Vector2) {
     super(pos);
     this.size = vec2(2, 1);
@@ -18,7 +18,7 @@ class Player extends e.EngineObject {
 const p = new Player(vec2(4, 10));
 
 function gameInit() {
-  e.setCameraScale(gridSize*3);
+  e.setCameraScale(gridSize * 3);
   // e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
   // e.setEnablePhysicsSolver(true);
@@ -79,14 +79,9 @@ function gameUpdatePost() {
   }
 }
 
-function gameRender() {
+function gameRender() {}
 
-}
-
-function gameRenderPost() {
-
-}
-
+function gameRenderPost() {}
 
 e.engineInit(
   gameInit,

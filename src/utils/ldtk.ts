@@ -7,7 +7,9 @@ import { fromDOMPoint } from "./dommatrix";
 import { hexColor } from "./color";
 
 export const gridSize = ldtkFile.defaultGridSize;
-export const textures: Maybe<string>[] = ldtkFile.defs.tilesets.map(t => t.relPath);
+export const textures: Maybe<string>[] = ldtkFile.defs.tilesets.map(
+  (t) => t.relPath,
+);
 
 export const layerDefs = Object.fromEntries(
   ldtkFile.defs.layers.map((l) => [l.identifier, l]),
@@ -21,7 +23,6 @@ export function getLevel(name: string) {
   if (!level) throw Error(`Unknown level ${name}`);
   return level;
 }
-
 
 export function getLayerInstanceFromLevel(level: Level, layerDefUid: number) {
   const layer = level.layerInstances?.find(
@@ -38,7 +39,7 @@ export function getLayerDefinition(layerName: string) {
 }
 
 export function getTileset(tilesetUid: number) {
-  const tileset = ldtkFile.defs.tilesets.find(tile => tile.uid == tilesetUid);
+  const tileset = ldtkFile.defs.tilesets.find((tile) => tile.uid == tilesetUid);
   if (!tileset) throw Error(`Unknown tileset ${tilesetUid}`);
   return tileset;
 }
@@ -58,7 +59,10 @@ export function ldtkLevel(name: string) {
   const numTiles = vec2(level.pxWid, level.pxHei).divide(vec2(gridSize));
   const structureLayerDef = getLayerDefinition("Structure");
   const entitiesLayerDef = getLayerDefinition("Entities");
-  const structureLayer = getLayerInstanceFromLevel(level, structureLayerDef.uid);
+  const structureLayer = getLayerInstanceFromLevel(
+    level,
+    structureLayerDef.uid,
+  );
   const entitiesLayer = getLayerInstanceFromLevel(level, entitiesLayerDef.uid);
   const spawn = getEntityFromLayer(entitiesLayer, "Spawn");
 
@@ -76,10 +80,13 @@ export function ldtkLevel(name: string) {
 
   const m = new DOMMatrix().translateSelf(0, layer.size.y - 1).scaleSelf(1, -1);
 
-  const spawnPos = fromDOMPoint(m.transformPoint(vec2(...spawn.__grid))).add(vec2(0.5, 0.5));
+  const spawnPos = fromDOMPoint(m.transformPoint(vec2(...spawn.__grid))).add(
+    vec2(0.5, 0.5),
+  );
 
   // Process auto-layer tiles if they exist
-  if (!(structureLayer.autoLayerTiles?.length > 0)) throw Error("Structure layer does not have auto tiles");
+  if (!(structureLayer.autoLayerTiles?.length > 0))
+    throw Error("Structure layer does not have auto tiles");
   for (const autoTile of structureLayer.autoLayerTiles) {
     const tilePosX = Math.floor(autoTile.px[0] / gridSize);
     const tilePosY = Math.floor(autoTile.px[1] / gridSize);

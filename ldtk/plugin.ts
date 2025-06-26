@@ -3,7 +3,6 @@ import * as types from "./ldtk";
 import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 
-
 function texturePlaceholder(id: number): string {
   return `__TEXTURE_PLACEHOLDER_${id}`;
 }
@@ -23,24 +22,27 @@ function processTextures(content: types.LdtkFile): string[] {
     tileset.relPath = texturePlaceholder(id);
   }
 
-  const imports = [...textures].map((texture, i) => `import texture_${i} from ${JSON.stringify(texture)};`);
+  const imports = [...textures].map(
+    (texture, i) => `import texture_${i} from ${JSON.stringify(texture)};`,
+  );
 
   return imports;
 }
 
-function generateModuleCode(
-  file: types.LdtkFile,
-  imports: string[],
-): string {
-  let jsonString = JSON.stringify({
-    ...file
-  }, null, 2);
+function generateModuleCode(file: types.LdtkFile, imports: string[]): string {
+  let jsonString = JSON.stringify(
+    {
+      ...file,
+    },
+    null,
+    2,
+  );
 
   // Replace the placeholder strings with actual import references
   for (const idx of imports.keys()) {
     jsonString = jsonString.replace(
       JSON.stringify(texturePlaceholder(idx)),
-      `texture_${idx}`
+      `texture_${idx}`,
     );
   }
 

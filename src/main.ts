@@ -6,7 +6,7 @@ class Player extends e.EngineObject {
   speed: number = .03;
   constructor(pos: e.Vector2) {
     super(pos);
-    this.size = vec2(1, 1);
+    this.size = vec2(2, 1);
     this.color = hsl(0.5, 1, 0.5);
     this.collideTiles = true;
     // this.collideSolidObjects = true;

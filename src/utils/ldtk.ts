@@ -57,14 +57,16 @@ export function ldtkLevel(name: string) {
 
   const m = new DOMMatrix().translateSelf(0, layer.size.y - 1).scaleSelf(1, -1);
 
-  const spawnPos = fromDOMPoint(m.transformPoint(vec2(...spawn.__grid)));
+  const spawnPos = fromDOMPoint(m.transformPoint(vec2(...spawn.__grid))).add(vec2(0.5, 0.5));
 
   let c = 0;
   for (let y = 0; y < layer.size.y; y++) {
     for (let x = 0; x < layer.size.x; x++, c++) {
       const ldtkCoordinate = vec2(x, y);
       const tileGridCoordinate = fromDOMPoint(m.transformPoint(ldtkCoordinate));
-      const data = layer.getData(tileGridCoordinate);
+      // Adjust to center-based coordinates by adding half a grid unit
+      const centerBasedCoordinate = tileGridCoordinate.add(vec2(0.5, 0.5));
+      const data = layer.getData(centerBasedCoordinate);
       const idx = structureLayer?.intGridCsv[c];
       // 0 means empty in LDTK
       if (idx == 0) {
@@ -72,7 +74,7 @@ export function ldtkLevel(name: string) {
         data.tile = undefined;
         continue;
       }
-      e.setTileCollisionData(tileGridCoordinate, 1);
+      e.setTileCollisionData(centerBasedCoordinate, 1);
       const gridValue = must(
         layerDefs["Structure"].intGridValues.find((v) => v.value == idx),
       );

@@ -601,13 +601,13 @@
 			"cachedPixelData": { "opaqueTiles": "010000100000000", "averageColors": "e365f355e355f355f255f355f256f355f355f255e355f355e365e48e0000" }
 		},
 		{
-			"__cWid": 1,
+			"__cWid": 4,
 			"__cHei": 1,
 			"identifier": "Cat",
 			"uid": 129,
-			"relPath": "cat-comp-ef6c00.png",
+			"relPath": "cat_run.png",
 			"embedAtlas": null,
-			"pxWid": 8,
+			"pxWid": 32,
 			"pxHei": 8,
 			"tileGridSize": 8,
 			"spacing": 0,
@@ -617,7 +617,7 @@
 			"enumTags": [],
 			"customData": [],
 			"savedSelections": [],
-			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "9d73" }
+			"cachedPixelData": { "opaqueTiles": "0000", "averageColors": "9c739c738c739c73" }
 		}
 	], "enums": [], "externalEnums": [], "levelFields": [] },
 	"levels": [

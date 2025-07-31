@@ -6,11 +6,72 @@ import {
   textures,
   getTilesetTextureIndex,
 } from "./utils/ldtk";
+import { Maybe } from "./utils/types";
 
+type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
+
+enum Action {
+  None,
+  Left,
+  Right,
+  Jump,
+}
 
 class Player extends e.EngineObject {
+  textureIndex = getTilesetTextureIndex("Cat");
   speed: number = 0.09;
   lastPos: [e.Vector2, e.Vector2];
+  animationFrame: number = 0;
+  animationTimer: number = 0;
+  animationSpeed: number = 0.1; // seconds per frame
+  totalFrames: number = 4; // number of frames in the sprite sheet
+  isMoving: boolean = false;
+  nextAction: Maybe<Action> = null;
+
+  stateMachine: State<Player, Action> = Player.Idle;
+
+  static Idle(p: Player, action: Action) {
+    p.velocity = vec2(0);
+    p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
+    if (action == Action.Left) {
+      p.mirror = true;
+      return Player.Walk;
+    } else if (action == Action.Right) {
+      p.mirror = false;
+      return Player.Walk;
+    } else if (action == Action.Jump) {
+      return Player.Jump;
+    }
+  }
+
+  static Walk(p: Player, action: Action) {
+    console.log(Action[action]);
+    if (action == Action.Left) {
+      p.velocity.x = -1 * p.speed;
+    } else if (action == Action.Right) {
+      p.velocity.x = p.speed;
+    } else if (action == Action.None) {
+      return Player.Idle;
+    } else if (action == Action.Jump) {
+      p.applyAcceleration(vec2(0, 0.3));
+      return Player.Jump;
+    }
+    p.animationTimer += e.timeDelta;
+    if (p.animationTimer >= p.animationSpeed) {
+      p.animationTimer = 0;
+      p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
+    }
+    p.tileInfo = tile(p.animationFrame, vec2(gridSize), p.textureIndex, 1);
+  }
+
+  static Jump(p: Player, action: Action) {
+    p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
+    if (action == Action.Left) {
+      p.velocity.x = -1 * p.speed * 0.5;
+    } else if (action == Action.Right) {
+      p.velocity.x = p.speed * 0.5;
+    }
+  }
 
   shouldMirror() {
     const [prev, now] = this.lastPos;
@@ -23,11 +84,7 @@ class Player extends e.EngineObject {
   }
 
   updateMirror() {
-    const oldMirror = this.shouldMirror();
-    this.updateLastPos();
-    const newMirror = this.shouldMirror();
-    if (newMirror === 0) return;
-    this.mirror = newMirror == -1;
+    this.mirror = this.shouldMirror() == -1;
   }
 
   constructor(pos: e.Vector2) {
@@ -48,7 +105,7 @@ class Player extends e.EngineObject {
       0, //emitAngle
       0, // size
       0, // time
-      5000, // rate
+      1000, // rate
       0.5, // cone
       tile(0, 16), // tileIndex, tileSize
       hsl(0, 1, 0.5),
@@ -75,8 +132,17 @@ class Player extends e.EngineObject {
     this.addChild(particleEmitter, vec2(-0.5, -0.2), -PI / 2);
   }
 
+  action(action: Action) {
+    this.nextAction = action;
+  }
+
   update(): void {
+    this.stateMachine =
+      this.stateMachine(this, this.nextAction ?? Action.None) ??
+      this.stateMachine;
+    this.nextAction = null;
     super.update();
+    this.updateLastPos();
     this.updateMirror();
   }
 }
@@ -105,17 +171,14 @@ function gameInit() {
 function gameUpdate() {}
 
 function gameUpdatePost() {
-  p.velocity.x = 0;
-
   if (e.keyIsDown("ArrowRight")) {
-    p.velocity.x = p.speed;
+    p.action(Action.Right);
   }
   if (e.keyIsDown("ArrowLeft")) {
-    p.velocity.x = -p.speed;
+    p.action(Action.Left);
   }
-
   if (e.keyWasPressed("Space")) {
-    p.applyAcceleration(vec2(0, 0.3));
+    p.action(Action.Jump);
   }
 }
 

@@ -40,12 +40,12 @@ class Player extends e.EngineObject {
       p.mirror = false;
       return Player.Walk;
     } else if (action == Action.Jump) {
+      p.applyAcceleration(vec2(0, 0.3));
       return Player.Jump;
     }
   }
 
   static Walk(p: Player, action: Action) {
-    console.log(Action[action]);
     if (action == Action.Left) {
       p.velocity.x = -1 * p.speed;
     } else if (action == Action.Right) {
@@ -70,6 +70,9 @@ class Player extends e.EngineObject {
       p.velocity.x = -1 * p.speed * 0.5;
     } else if (action == Action.Right) {
       p.velocity.x = p.speed * 0.5;
+    }
+    if (p.groundObject) {
+      return Player.Idle;
     }
   }
 

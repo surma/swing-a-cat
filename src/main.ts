@@ -7,6 +7,8 @@ import {
   getTilesetTextureIndex,
 } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
+import SoundPlayer from './player-small.js';
+import swingMusicData from './swingmusic.js';
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
@@ -169,6 +171,41 @@ function gameInit() {
 
   p = new Player(vec2(4, 10));
   p.pos = vec2(spawnPos);
+
+  // Correctly initialize the music generator with the full song data
+    const musicGenerator = new SoundPlayer();
+    musicGenerator.init(swingMusicData);
+
+    // This loop generates the entire song, channel by channel
+    // It's important to call generate() repeatedly until it's done
+    let progress = 0;
+    while(progress < 1) {
+        progress = musicGenerator.generate();
+    }
+    console.log("Music generation complete!");
+
+  const startTextElement = document.createElement('p');
+              startTextElement.id = 'startText';
+              startTextElement.textContent = 'become oranj catte';
+              startTextElement.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5rem; font-family: "Comic Sans MS", cursive; color: orange; z-index: 100;';
+              document.body.appendChild(startTextElement);
+    // The rest of the Web Audio API code is correct
+    let audioContext: AudioContext;
+
+    document.addEventListener('mousedown', () => {
+      if (startTextElement) {
+                      startTextElement.remove();
+                  }
+        if (!audioContext) {
+            audioContext = new AudioContext();
+        }
+        
+        const buffer = musicGenerator.createAudioBuffer(audioContext);
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+        source.start();
+    }, { once: true });
 }
 
 function gameUpdate() {}

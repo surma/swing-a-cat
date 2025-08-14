@@ -1,25 +1,32 @@
 import { Maybe } from "./utils/types";
 
-type NextState<D, A> = Maybe<State<D, A>;
+type NextStateName<D, A> = Maybe<string>;
 
-export type StateFunction<D, A> = (data: D, action: A) => NextState<D, A>;
+export type StateFunction<D, A> = (data: D, action: A) => NextStateName<D, A>;
 
 export interface ExtendedState<D, A> {
-	enter(data: D, action: A): void;
-	stay(data: D, action: A): NextState<D,A>;
-	exit(data: D, action: A): void;
+  enter?(data: D, action: A): void;
+  update(data: D, action: A): NextStateName<D, A>;
+  exit?(data: D, action: A): void;
 }
 
-export type State<D, A> = StateFunction<D, A> | ExtendedState<D,A>;
+export type State<D, A> = ExtendedState<D, A>;
 
 export type StateMachine<D, A> = Record<string, State<D, A>>;
 
-export default function stateMachine<D, A>(desc: StateMachine<D, A>) {
-	const currentState= Object.values(desc)[0];
+export default function stateMachine<D, A>(desc: StateMachine<D, A>, data: D) {
+  let currentState = Object.values(desc)[0];
 
-	return {
-		action(action: A) {
-			
-		}
-	}
+  return {
+    action(action: A) {
+      const nextStateName = currentState.update(data, action);
+      if (nextStateName) {
+        const nextState = desc[nextStateName];
+        if (!nextState) throw Error(`Invalid state name ${nextStateName}`);
+        currentState.exit?.(data, action);
+        nextState.enter?.(data, action);
+        currentState = nextState;
+      }
+    },
+  };
 }

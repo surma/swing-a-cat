@@ -18,6 +18,7 @@ enum Action {
 }
 
 class Player extends e.EngineObject {
+  rope: Rope | null = null;
   textureIndex = getTilesetTextureIndex("Cat");
   speed: number = 0.09;
   lastPos: [e.Vector2, e.Vector2];
@@ -90,6 +91,17 @@ class Player extends e.EngineObject {
     this.mirror = this.shouldMirror() == -1;
   }
 
+  detachRope() {
+    if (!this.rope) return;
+    this.rope.destroy();
+    this.rope = null;
+  }
+
+  shootRope() {
+    this.detachRope();
+    this.rope = new Rope(p.pos);
+  }
+
   constructor(pos: e.Vector2) {
     super(pos);
     this.lastPos = [pos.copy(), pos.copy()];
@@ -103,36 +115,36 @@ class Player extends e.EngineObject {
     // this.collideSolidObjects = true;
     this.collideRaycast = false;
 
-    const particleEmitter = new e.ParticleEmitter(
-      vec2(0, 0), // emitPos,
-      0, //emitAngle
-      0, // size
-      0, // time
-      1000, // rate
-      0.5, // cone
-      tile(0, 16), // tileIndex, tileSize
-      hsl(0, 1, 0.5),
-      hsl(2 / 3, 1, 0.5), // colorStartA, colorStartB
-      hsl(0, 0, 0, 0),
-      hsl(0, 0, 0, 0), // colorEndA, colorEndB
-      2, //time
-      0.2, // size start
-      0.2, // size end
-      0.1, // speed
-      0.05, // angleSpeed
-      0.99, // damping
-      1, // angle damping
-      0, // gravity scle
-      PI, //cone
-      0.05, // fade rate
-      0.5, // randmness
-      true, // collide
-      true, //  additive
-    );
-    particleEmitter.elasticity = 0.3; // bounce when it collides
-    particleEmitter.trailScale = 2; // stretch in direction of motion
+    // const particleEmitter = new e.ParticleEmitter(
+    //   vec2(0, 0), // emitPos,
+    //   0, //emitAngle
+    //   0, // size
+    //   0, // time
+    //   1000, // rate
+    //   0.5, // cone
+    //   tile(0, 16), // tileIndex, tileSize
+    //   hsl(0, 1, 0.5),
+    //   hsl(2 / 3, 1, 0.5), // colorStartA, colorStartB
+    //   hsl(0, 0, 0, 0),
+    //   hsl(0, 0, 0, 0), // colorEndA, colorEndB
+    //   2, //time
+    //   0.2, // size start
+    //   0.2, // size end
+    //   0.1, // speed
+    //   0.05, // angleSpeed
+    //   0.99, // damping
+    //   1, // angle damping
+    //   0, // gravity scle
+    //   PI, //cone
+    //   0.05, // fade rate
+    //   0.5, // randmness
+    //   true, // collide
+    //   true, //  additive
+    // );
+    // particleEmitter.elasticity = 0.3; // bounce when it collides
+    // particleEmitter.trailScale = 2; // stretch in direction of motion
 
-    this.addChild(particleEmitter, vec2(-0.5, -0.2), -PI / 2);
+    // this.addChild(particleEmitter, vec2(-0.5, -0.2), -PI / 2);
   }
 
   action(action: Action) {
@@ -145,8 +157,17 @@ class Player extends e.EngineObject {
       this.stateMachine;
     this.nextAction = null;
     super.update();
+    this.snapPosition();
     this.updateLastPos();
     this.updateMirror();
+  }
+
+  snapPosition(): void {
+    const MAX_LENGTH = 6;
+    if (!this.rope) return;
+    const dir = p.pos.subtract(this.rope.pos);
+    if (dir.length() < MAX_LENGTH) return;
+    p.pos = this.rope.pos.add(dir.normalize().scale(MAX_LENGTH));
   }
 }
 
@@ -173,6 +194,25 @@ function gameInit() {
 
 function gameUpdate() {}
 
+class Rope extends e.EngineObject {
+  // anchor: e.Vector2;
+
+  constructor(currentPos: e.Vector2) {
+    const dir = e.mousePos.subtract(p.pos).normalize();
+    const pos = e.tileCollisionRaycast(currentPos, p.pos.add(dir.scale(100)));
+    super(pos, vec2(1, 1));
+  }
+
+  update(): void {
+    // e.drawLine(p.pos, this.pos, .1, e.RED);
+    // e.drawCircle(this.pos, 1, e.RED, 1);
+  }
+
+  render(): void {
+    e.drawLine(p.pos, this.pos, 0.1, e.RED);
+  }
+}
+
 function gameUpdatePost() {
   if (e.keyIsDown("ArrowRight")) {
     p.action(Action.Right);
@@ -183,6 +223,17 @@ function gameUpdatePost() {
   if (e.keyWasPressed("Space")) {
     p.action(Action.Jump);
   }
+  if (e.keyWasPressed("KeyE")) {
+    p.shootRope();
+  }
+
+  if (e.keyWasPressed("KeyQ")) {
+    p.detachRope();
+  }
+
+  // e.mainCanvas.draw
+  // console.log(r)
+  // p.action(Action.Jump);
 }
 
 function gameRender() {}

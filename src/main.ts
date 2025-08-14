@@ -7,6 +7,7 @@ import {
   getTilesetTextureIndex,
 } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
+import "./music";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 

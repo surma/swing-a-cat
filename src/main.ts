@@ -288,22 +288,24 @@ class Player extends e.EngineObject {
 let p: Player;
 
 function gameInit() {
-  e.setCameraScale(gridSize * 3);
+  e.setCameraScale(gridSize * 2);
   // e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
-  // e.setEnablePhysicsSolver(true);
   e.setGravity(-0.01);
   e.setInputWASDEmulateDirection(true);
-  e.initTileCollision(vec2(32, 32));
+
+  // Hardcoding this because this call MUST happen before I create a TileLayer
+  // (inside ldtkLevel()), and I don't wanna grab the data manually lol.
+  e.initTileCollision(vec2(90, 90));
 
   const { layer, spawnPos } = ldtkLevel("Level_1");
-  // layer.size = layer.size.multiply(vec2(8));
-  // layer.scale = layer.scale.multiply(vec2(8));
   e.setCameraPos(layer.size.scale(0.5));
+  layer.collideRaycast = true;
+  layer.collideSolidObjects = true;
+  layer.collideTiles = true;
   layer.redraw();
 
-  p = new Player(vec2(4, 10));
-  p.pos = vec2(spawnPos);
+  p = new Player(spawnPos);
 }
 
 function gameUpdate() {}

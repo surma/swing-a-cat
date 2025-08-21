@@ -7,6 +7,10 @@ import {
   getTilesetTextureIndex,
 } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
+import stateMachine, {
+  StateMachine,
+  StateMachineInstance,
+} from "./state-machine";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
@@ -15,6 +19,8 @@ enum Action {
   Left,
   Right,
   Jump,
+  ShootRope,
+  ReleaseRope,
 }
 
 class Player extends e.EngineObject {
@@ -29,53 +35,8 @@ class Player extends e.EngineObject {
   isMoving: boolean = false;
   nextAction: Maybe<Action> = null;
 
-  stateMachine: State<Player, Action> = Player.Idle;
-
-  static Idle(p: Player, action: Action) {
-    p.velocity = vec2(0);
-    p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
-    if (action == Action.Left) {
-      p.mirror = true;
-      return Player.Walk;
-    } else if (action == Action.Right) {
-      p.mirror = false;
-      return Player.Walk;
-    } else if (action == Action.Jump) {
-      p.applyAcceleration(vec2(0, 0.3));
-      return Player.Jump;
-    }
-  }
-
-  static Walk(p: Player, action: Action) {
-    if (action == Action.Left) {
-      p.velocity.x = -1 * p.speed;
-    } else if (action == Action.Right) {
-      p.velocity.x = p.speed;
-    } else if (action == Action.None) {
-      return Player.Idle;
-    } else if (action == Action.Jump) {
-      p.applyAcceleration(vec2(0, 0.3));
-      return Player.Jump;
-    }
-    p.animationTimer += e.timeDelta;
-    if (p.animationTimer >= p.animationSpeed) {
-      p.animationTimer = 0;
-      p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
-    }
-    p.tileInfo = tile(p.animationFrame, vec2(gridSize), p.textureIndex, 1);
-  }
-
-  static Jump(p: Player, action: Action) {
-    p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
-    if (action == Action.Left) {
-      p.velocity.x = -1 * p.speed * 0.5;
-    } else if (action == Action.Right) {
-      p.velocity.x = p.speed * 0.5;
-    }
-    if (p.groundObject) {
-      return Player.Idle;
-    }
-  }
+  stateMachine: StateMachineInstance<{ update: () => void }, Action> =
+    this.initStateMachine();
 
   shouldMirror() {
     const [prev, now] = this.lastPos;
@@ -104,6 +65,8 @@ class Player extends e.EngineObject {
 
   constructor(pos: e.Vector2) {
     super(pos);
+
+    // this.initStateMachine();
     this.lastPos = [pos.copy(), pos.copy()];
     this.size = vec2(1, 1);
 
@@ -147,16 +110,99 @@ class Player extends e.EngineObject {
     // this.addChild(particleEmitter, vec2(-0.5, -0.2), -PI / 2);
   }
 
+  initStateMachine() {
+    return stateMachine(
+      {
+        idle: {
+          update(data, action) {
+            data.update();
+            if (action == Action.ShootRope) return "rope";
+            p.velocity = vec2(0);
+            p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
+            if (action == Action.Left) {
+              p.mirror = true;
+              return "walk";
+            } else if (action == Action.Right) {
+              p.mirror = false;
+              return "walk";
+            } else if (action == Action.Jump) {
+              p.applyAcceleration(vec2(0, 0.3));
+              return "jump";
+            }
+            return null;
+          },
+        },
+
+        walk: {
+          update(data, action: Action) {
+            data.update();
+            if (action == Action.ShootRope) return "rope";
+
+            if (action == Action.Left) {
+              p.velocity.x = -1 * p.speed;
+            } else if (action == Action.Right) {
+              p.velocity.x = p.speed;
+            } else if (action == Action.None) {
+              return "idle";
+            } else if (action == Action.Jump) {
+              p.applyAcceleration(vec2(0, 0.3));
+              return "jump";
+            }
+            p.animationTimer += e.timeDelta;
+            if (p.animationTimer >= p.animationSpeed) {
+              p.animationTimer = 0;
+              p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
+            }
+            p.tileInfo = tile(
+              p.animationFrame,
+              vec2(gridSize),
+              p.textureIndex,
+              1,
+            );
+          },
+        },
+
+        jump: {
+          update(data, action: Action) {
+            data.update();
+            if (action == Action.ShootRope) return "rope";
+            p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
+            if (action == Action.Left) {
+              p.velocity.x = -1 * p.speed * 0.5;
+            } else if (action == Action.Right) {
+              p.velocity.x = p.speed * 0.5;
+            }
+            if (p.groundObject) {
+              return "idle";
+            }
+          },
+        },
+        rope: {
+          enter(data, action) {
+            data.player.shootRope();
+          },
+          update(data, action) {
+            if (action == Action.ReleaseRope) {
+              return "idle";
+            }
+          },
+          exit(data, action) {
+            data.player.detachRope();
+          },
+        },
+      },
+      { player: this, update: () => super.update.call(this) },
+    );
+  }
+
   action(action: Action) {
     this.nextAction = action;
   }
 
   update(): void {
-    this.stateMachine =
-      this.stateMachine(this, this.nextAction ?? Action.None) ??
-      this.stateMachine;
+    this.stateMachine.action(this.nextAction ?? Action.None);
     this.nextAction = null;
-    super.update();
+    // super.update();
     this.snapPosition();
     this.updateLastPos();
     this.updateMirror();
@@ -224,11 +270,11 @@ function gameUpdatePost() {
     p.action(Action.Jump);
   }
   if (e.keyWasPressed("KeyE")) {
-    p.shootRope();
+    p.action(Action.ShootRope);
   }
 
   if (e.keyWasPressed("KeyQ")) {
-    p.detachRope();
+    p.action(Action.ReleaseRope);
   }
 
   // e.mainCanvas.draw

@@ -12,6 +12,7 @@ import stateMachine, {
   StateMachine,
   StateMachineInstance,
 } from "./state-machine";
+import { dictMap } from "./utils/helpers";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
@@ -67,7 +68,6 @@ class Player extends e.EngineObject {
   constructor(pos: e.Vector2) {
     super(pos);
 
-    // this.initStateMachine();
     this.lastPos = [pos.copy(), pos.copy()];
     this.size = vec2(1, 1);
 
@@ -118,19 +118,14 @@ class Player extends e.EngineObject {
           update(data, action) {
             data.update();
             if (action == Action.ShootRope) return "rope";
+            if (action == Action.Jump) return "jump";
+
             p.velocity = vec2(0);
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
-            if (action == Action.Left) {
-              p.mirror = true;
-              return "walk";
-            } else if (action == Action.Right) {
-              p.mirror = false;
-              return "walk";
-            } else if (action == Action.Jump) {
-              p.applyAcceleration(vec2(0, 0.3));
-              return "jump";
-            }
-            return null;
+
+            p.mirror = action == Action.Left;
+            if (action == Action.Left) return "walk";
+            if (action == Action.Right) return "walk";
           },
         },
 
@@ -138,18 +133,16 @@ class Player extends e.EngineObject {
           update(data, action: Action) {
             data.update();
             if (action == Action.ShootRope) return "rope";
+            if (action == Action.None) return "idle";
+            if (action == Action.Jump) return "jump";
 
-            if (action == Action.Left) {
-              p.velocity.x = -1 * p.speed;
-            } else if (action == Action.Right) {
-              p.velocity.x = p.speed;
-            } else if (action == Action.None) {
-              return "idle";
-            } else if (action == Action.Jump) {
-              p.applyAcceleration(vec2(0, 0.3));
-              return "jump";
-            }
+            p.velocity.x =
+              dictMap(
+                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+                action,
+              ) * p.speed;
             p.animationTimer += e.timeDelta;
+
             if (p.animationTimer >= p.animationSpeed) {
               p.animationTimer = 0;
               p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
@@ -164,31 +157,41 @@ class Player extends e.EngineObject {
         },
 
         jump: {
+          enter({ player }, action) {
+            player.applyAcceleration(vec2(0, 0.3));
+          },
           update(data, action: Action) {
-            data.update();
+            return "falling";
+          },
+        },
+        falling: {
+          update({ update }, action: Action) {
+            update();
             if (action == Action.ShootRope) return "rope";
+            if (p.groundObject) return "idle";
+
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
-            if (action == Action.Left) {
-              p.velocity.x = -1 * p.speed * 0.5;
-            } else if (action == Action.Right) {
-              p.velocity.x = p.speed * 0.5;
-            }
-            if (p.groundObject) {
-              return "idle";
-            }
+
+            p.velocity.x =
+              dictMap(
+                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+                action,
+              ) *
+              p.speed *
+              0.5;
           },
         },
         rope: {
-          enter(data, action) {
-            data.player.shootRope();
+          enter({ player }, action) {
+            player.shootRope();
+            player.snapPosition();
           },
           update(data, action) {
-            if (action == Action.ReleaseRope) {
-              return "idle";
-            }
+            if (action == Action.ReleaseRope) return "falling";
           },
-          exit(data, action) {
-            data.player.detachRope();
+          exit({ player }, action) {
+            player.detachRope();
+            player.groundObject = null;
           },
         },
       },
@@ -203,8 +206,6 @@ class Player extends e.EngineObject {
   update(): void {
     this.stateMachine.action(this.nextAction ?? Action.None);
     this.nextAction = null;
-    // super.update();
-    this.snapPosition();
     this.updateLastPos();
     this.updateMirror();
   }
@@ -242,18 +243,13 @@ function gameInit() {
 function gameUpdate() {}
 
 class Rope extends e.EngineObject {
-  // anchor: e.Vector2;
-
   constructor(currentPos: e.Vector2) {
     const dir = e.mousePos.subtract(p.pos).normalize();
     const pos = e.tileCollisionRaycast(currentPos, p.pos.add(dir.scale(100)));
     super(pos, vec2(1, 1));
   }
 
-  update(): void {
-    // e.drawLine(p.pos, this.pos, .1, e.RED);
-    // e.drawCircle(this.pos, 1, e.RED, 1);
-  }
+  update(): void {}
 
   render(): void {
     e.drawLine(p.pos, this.pos, 0.1, e.RED);

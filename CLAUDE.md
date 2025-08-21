@@ -1,6 +1,80 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides comprehensive guidance to Claude Code when working with Node.js 23 applications.
+
+## Core Development Philosophy
+
+### KISS (Keep It Simple, Stupid)
+
+Simplicity should be a key goal in design. Choose straightforward solutions over complex ones whenever possible. Simple solutions are easier to understand, maintain, and debug.
+
+### YAGNI (You Aren't Gonna Need It)
+
+Avoid building functionality on speculation. Implement features only when they are needed, not when you anticipate they might be useful in the future.
+
+### Design Principles
+
+- **Modular Architecture**: Build with small, focused modules that do one thing well
+- **Error-First Callbacks**: Always handle errors as the first parameter in callbacks
+- **Async by Default**: Use async/await for all I/O operations
+- **Fail Fast**: Validate inputs early and throw meaningful errors immediately
+- **Security First**: Never trust user input, always validate and sanitize
+
+## 🤖 AI Assistant Guidelines
+
+### Context Awareness
+
+- When implementing features, always check existing patterns first
+- Prefer composition over inheritance in all designs
+- Use existing utilities before creating new ones
+- Check for similar functionality in other domains/features
+
+### Common Pitfalls to Avoid
+
+- Creating duplicate functionality
+- Overwriting existing tests
+- Modifying core frameworks without explicit instruction
+- Adding dependencies without checking existing alternatives
+
+### Workflow Patterns
+
+- Prefferably create tests BEFORE implementation (TDD)
+- Use "think hard" for architecture decisions
+- Break complex tasks into smaller, testable units
+- Validate understanding before implementation
+
+### Search Command Requirements
+
+**CRITICAL**: Always use `rg` (ripgrep) instead of traditional `grep` and `find` commands:
+
+```bash
+# ❌ Don't use grep
+grep -r "pattern" .
+
+# ✅ Use rg instead
+rg "pattern"
+
+# ❌ Don't use find with name
+find . -name "*.js"
+
+# ✅ Use rg with file filtering
+rg --files | rg "\.js$"
+# or
+rg --files -g "*.js"
+```
+
+**Enforcement Rules:**
+
+```
+(
+    r"^grep\b(?!.*\|)",
+    "Use 'rg' (ripgrep) instead of 'grep' for better performance and features",
+),
+(
+    r"^find\s+\S+\s+-name\b",
+    "Use 'rg --files | rg pattern' or 'rg --files -g pattern' instead of 'find -name' for better performance",
+),
+```
 
 ## Project Overview
 

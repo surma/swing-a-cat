@@ -233,9 +233,21 @@ class Player extends e.EngineObject {
                 action,
               ) * swingForce;
 
-            // Update player position based on rope angle
-            p.pos.x = p.rope!.pos.x + p.ropeLength * Math.sin(p.ropeAngle);
-            p.pos.y = p.rope!.pos.y - p.ropeLength * Math.cos(p.ropeAngle);
+            // Calculate new position based on rope angle
+            const newPos = vec2(
+              p.rope!.pos.x + p.ropeLength * Math.sin(p.ropeAngle),
+              p.rope!.pos.y - p.ropeLength * Math.cos(p.ropeAngle),
+            );
+
+            // Check for tile collisions
+            const oldPos = p.pos.copy();
+            p.pos = newPos;
+
+            const collision = e.tileCollisionRaycast(oldPos, p.pos);
+            if (collision) {
+              p.pos = oldPos;
+              p.ropeAngularVelocity *= -1;
+            }
 
             // Calculate linear velocity for when rope is released
             p.velocity.x =

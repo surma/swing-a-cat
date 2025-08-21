@@ -28,7 +28,8 @@ enum Action {
 class Player extends e.EngineObject {
   rope: Rope | null = null;
   textureIndex = getTilesetTextureIndex("Cat");
-  speed: number = 0.09;
+  SPEED: number = 0.09;
+  AIR_CONTROL: number = 0.001;
   lastPos: [e.Vector2, e.Vector2];
   animationFrame: number = 0;
   animationTimer: number = 0;
@@ -152,7 +153,7 @@ class Player extends e.EngineObject {
               dictMap(
                 { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
                 action,
-              ) * p.speed;
+              ) * p.SPEED;
             p.animationTimer += e.timeDelta;
 
             if (p.animationTimer >= p.animationSpeed) {
@@ -184,13 +185,15 @@ class Player extends e.EngineObject {
 
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
 
-            p.velocity.x =
-              dictMap(
-                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
-                action,
-              ) *
-              p.speed *
-              0.5;
+            p.applyAcceleration(
+              vec2(
+                dictMap(
+                  { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+                  action,
+                ) * p.AIR_CONTROL,
+                0,
+              ),
+            );
           },
         },
         rope: {
@@ -211,7 +214,6 @@ class Player extends e.EngineObject {
           },
           update(data, action: Action) {
             if (action == Action.ReleaseRope) return "falling";
-
             // Manual pendulum physics
             const gravity = 0.01; // Same as game gravity but positive
             const damping = 0.99; // Slight damping to make it feel realistic
@@ -249,15 +251,10 @@ class Player extends e.EngineObject {
               p.ropeAngularVelocity *= -1;
             }
 
-            // Calculate linear velocity for when rope is released
-            p.velocity.x =
-              p.ropeLength * p.ropeAngularVelocity * Math.cos(p.ropeAngle);
-            p.velocity.y =
-              p.ropeLength * p.ropeAngularVelocity * Math.sin(p.ropeAngle);
+            p.velocity = p.pos.subtract(oldPos);
           },
           exit({ player }, action) {
             player.detachRope();
-            player.groundObject = null;
           },
         },
       },

@@ -10,6 +10,7 @@ const audioContext = new AudioContext();
 const buffer = musicGenerator.createAudioBuffer(audioContext);
 const source = audioContext.createBufferSource();
 source.buffer = buffer;
+source.loop = true;
 source.connect(audioContext.destination);
 
 document.addEventListener("keydown", () => source.start(), { once: true });

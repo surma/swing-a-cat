@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides comprehensive guidance to Claude Code when working with Node.js 23 applications.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Core Development Philosophy
 
@@ -83,8 +83,11 @@ This is "To Swing a Cat" - a js13k 2025 competition entry. It's a pixel art plat
 ## Development Commands
 
 ```bash
-npm start    # Start development server with hot reload
-npm run build # Create production build and check size
+npm start           # Start Vite dev server with hot reload
+npm run build       # Production build with size report (currently ~17.48KB gzipped)
+npx vitest          # Run tests once
+npx vitest watch    # Run tests in watch mode
+npx vitest run <file>  # Run specific test file
 ```
 
 ## Architecture Overview
@@ -99,7 +102,13 @@ The game uses LittleJS Engine (v1.11.8) with TypeScript. The engine initializati
 
 ### Key Systems
 
-**Level Loading**: LDTK integration via `ldtk/plugin.ts` automatically imports textures and generates collision data. Levels are stored as `.ldtk` files and processed at build time.
+**Level Loading**: LDTK integration via `ldtk/plugin.ts` automatically imports textures and generates collision data. Levels are stored as `.ldtk` files and processed at build time. Current level file: `swingcat-level-playground.ldtk`.
+
+**Player State Machine**: The player uses a finite state machine (`state-machine.ts`) to manage states:
+
+- States: Idle, Running, Jumping, Falling, Swinging (to be implemented)
+- Transitions based on Action enum (None, Left, Right, Jump, ShootRope, ReleaseRope)
+- Each state handles its own physics updates and animations
 
 **Input Handling**:
 
@@ -112,12 +121,13 @@ The game uses LittleJS Engine (v1.11.8) with TypeScript. The engine initializati
 
 - Basic platformer movement implemented
 - LDTK level loading functional
-- Player can move and jump
-- **Missing**: Tail collection system, swinging mechanics, audio, multiple levels, UI
+- Player can move and jump with state machine
+- Player sprite animation (4 frames)
+- **Missing**: Tail collection system, swinging mechanics (Rope class started), audio integration, multiple levels, UI
 
 ### Size Optimization
 
-Currently ~15.42KB gzipped (exceeds limit). Size reduction strategies:
+Currently ~17.48KB gzipped (exceeds limit). Size reduction strategies:
 
 - Tree-shaking unused LittleJS features
 - Minification via Terser
@@ -133,4 +143,51 @@ Currently ~15.42KB gzipped (exceeds limit). Size reduction strategies:
 
 ### Testing
 
-Run tests with: `npm test` (Vitest with Playwright browser testing)
+Testing setup uses Vitest with Playwright browser testing:
+
+- Test files: `*.test.ts` pattern
+- Browser environment: Chromium headless
+- Visual testing: Screenshots saved to `__screenshots__/` directories
+- Current test files: `src/state-machine.test.ts`, `src/utils/color.test.ts`
+
+## Project Structure
+
+```
+src/
+├── main.ts              # Game entry (gameInit, gameUpdate, gameRender)
+├── music.ts             # Audio system integration
+├── state-machine.ts     # Generic state machine implementation
+├── player-small.js      # Player sprite data
+├── swingmusic.js        # Music data
+└── utils/
+    ├── color.ts         # HSL color utilities
+    ├── dommatrix.ts     # Matrix transformations
+    ├── helpers.ts       # General utilities (dictMap, etc.)
+    ├── ldtk.ts          # LDTK level data handling
+    └── types.ts         # TypeScript type definitions (Maybe<T>, etc.)
+
+ldtk/
+├── plugin.ts            # Vite plugin for LDTK file processing
+└── ldtk.d.ts           # LDTK type definitions
+```
+
+## Useful Search Patterns
+
+```bash
+# Find game entities
+rg "class.*extends.*EngineObject"
+
+# Find state definitions
+rg "state.*=>"
+
+# Find input handling
+rg "keyIsDown|keyWasPressed"
+
+# Find LDTK levels
+rg --files -g "*.ldtk"
+
+# Find specific game systems
+rg "rope|swing|tail"  # For swinging mechanics
+rg "texture|sprite"   # For rendering code
+rg "collision|tile"   # For physics/collision
+```

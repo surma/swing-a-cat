@@ -37,6 +37,11 @@ class Player extends e.EngineObject {
   isMoving: boolean = false;
   nextAction: Maybe<Action> = null;
 
+  // Rope physics properties
+  ropeAngle: number = 0; // Current angle of the rope (0 = straight down)
+  ropeAngularVelocity: number = 0; // Angular velocity of the pendulum
+  ropeLength: number = 0; // Length of the rope
+
   stateMachine: StateMachineInstance<{ update: () => void }, Action> =
     this.initStateMachine();
 
@@ -185,9 +190,51 @@ class Player extends e.EngineObject {
           enter({ player }, action) {
             player.shootRope();
             player.snapPosition();
+
+            // Initialize rope physics
+            const ropeVector = player.pos.subtract(player.rope!.pos);
+            player.ropeLength = ropeVector.length();
+            player.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
+
+            // Convert current velocity to angular velocity
+            const tangentialVelocity =
+              player.velocity.x * Math.cos(player.ropeAngle) -
+              player.velocity.y * Math.sin(player.ropeAngle);
+            player.ropeAngularVelocity = tangentialVelocity / player.ropeLength;
           },
-          update(data, action) {
+          update(data, action: Action) {
             if (action == Action.ReleaseRope) return "falling";
+
+            // Manual pendulum physics
+            const gravity = 0.01; // Same as game gravity but positive
+            const damping = 0.99; // Slight damping to make it feel realistic
+
+            // Calculate angular acceleration (pendulum equation)
+            const angularAcceleration =
+              -(gravity / p.ropeLength) * Math.sin(p.ropeAngle);
+
+            // Update angular velocity and angle
+            p.ropeAngularVelocity += angularAcceleration;
+            p.ropeAngularVelocity *= damping;
+            p.ropeAngle += p.ropeAngularVelocity;
+
+            // Handle player input for swing control
+            const swingForce = 0.001;
+            p.ropeAngularVelocity +=
+              dictMap(
+                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+                action,
+              ) * swingForce;
+
+            // Update player position based on rope angle
+            p.pos.x = p.rope!.pos.x + p.ropeLength * Math.sin(p.ropeAngle);
+            p.pos.y = p.rope!.pos.y - p.ropeLength * Math.cos(p.ropeAngle);
+
+            // Calculate linear velocity for when rope is released
+            p.velocity.x =
+              p.ropeLength * p.ropeAngularVelocity * Math.cos(p.ropeAngle);
+            p.velocity.y =
+              p.ropeLength * p.ropeAngularVelocity * Math.sin(p.ropeAngle);
           },
           exit({ player }, action) {
             player.detachRope();

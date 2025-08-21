@@ -65,9 +65,16 @@ class Player extends e.EngineObject {
     this.rope = null;
   }
 
+  /**
+   * @returns {boolean} True if the rope hit something
+   */
   shootRope() {
     this.detachRope();
-    this.rope = new Rope(p.pos);
+    const dir = e.mousePos.subtract(p.pos).normalize();
+    const ropeAnchor = e.tileCollisionRaycast(p.pos, p.pos.add(dir.scale(100)));
+    if (!ropeAnchor) return false;
+    this.rope = new Rope(ropeAnchor);
+    return true;
   }
 
   constructor(pos: e.Vector2) {
@@ -188,7 +195,7 @@ class Player extends e.EngineObject {
         },
         rope: {
           enter({ player }, action) {
-            player.shootRope();
+            if (!player.shootRope()) return "falling";
             player.snapPosition();
 
             // Initialize rope physics
@@ -290,9 +297,7 @@ function gameInit() {
 function gameUpdate() {}
 
 class Rope extends e.EngineObject {
-  constructor(currentPos: e.Vector2) {
-    const dir = e.mousePos.subtract(p.pos).normalize();
-    const pos = e.tileCollisionRaycast(currentPos, p.pos.add(dir.scale(100)));
+  constructor(pos: e.Vector2) {
     super(pos, vec2(1, 1));
   }
 

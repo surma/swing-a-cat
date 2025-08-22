@@ -12,7 +12,6 @@ import stateMachine, {
   StateMachine,
   StateMachineInstance,
 } from "./state-machine";
-import { dictMap } from "./utils/helpers";
 import { Action, Player } from "./player";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
@@ -45,26 +44,12 @@ function gameInit() {
 function gameUpdate() {}
 
 function gameUpdatePost() {
-  if (e.keyIsDown("ArrowRight")) {
-    p.action(Action.Right);
+  const KEYS = ["ArrowRight", "ArrowLeft", "Space", "KeyE", "KeyQ"];
+  for (const key of KEYS) {
+    if (e.keyIsDown(key)) {
+      p.action(p.stateMachine.currentState.input(key));
+    }
   }
-  if (e.keyIsDown("ArrowLeft")) {
-    p.action(Action.Left);
-  }
-  if (e.keyWasPressed("Space")) {
-    p.action(Action.Jump);
-  }
-  if (e.keyWasPressed("KeyE")) {
-    p.action(Action.ShootRope);
-  }
-
-  if (e.keyWasPressed("KeyQ")) {
-    p.action(Action.ReleaseRope);
-  }
-
-  // e.mainCanvas.draw
-  // console.log(r)
-  // p.action(Action.Jump);
 }
 
 function gameRender() {}

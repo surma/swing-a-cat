@@ -1,30 +1,33 @@
 import { Maybe } from "./utils/types";
 
-type NextStateName<D, A> = Maybe<string> | void;
+type NextStateName<D, A, E> = Maybe<string> | void;
 
-export type StateFunction<D, A> = (data: D, action: A) => NextStateName<D, A>;
+export type StateFunction<D, A, E = {}> = (
+  data: D,
+  action: A,
+) => NextStateName<D, A, E>;
 
-export interface ExtendedState<D, A> {
-  enter?(data: D, action: A): NextStateName<D, A>;
-  update(data: D, action: A): NextStateName<D, A>;
-  exit?(data: D, action: A): NextStateName<D, A>;
+export interface StateCallbacks<D, A, E> {
+  enter?(data: D, action: A): NextStateName<D, A, E>;
+  update(data: D, action: A): NextStateName<D, A, E>;
+  exit?(data: D, action: A): NextStateName<D, A, E>;
 }
 
-export type State<D, A> = ExtendedState<D, A>;
+export type State<D, A, E> = StateCallbacks<D, A, E> & E;
 
-export type StateMachine<D, A> = Record<string, State<D, A>>;
+export type StateMachine<D, A, E> = Record<string, State<D, A, E>>;
 
-export interface StateMachineInstance<D, A> {
-  get currentState(): ExtendedState<D, A>;
+export interface StateMachineInstance<D, A, E = {}> {
+  get currentState(): State<D, A, E>;
   action(action: A): void;
 }
-export default function stateMachine<D, A>(
-  desc: StateMachine<D, A>,
+export default function stateMachine<D, A, E = {}>(
+  desc: StateMachine<D, A, E>,
   data: D,
 ): StateMachineInstance<D, A> {
   let currentState = Object.values(desc)[0];
 
-  function _handleNextState(nextStateName: NextStateName<D, A>, action: A) {
+  function _handleNextState(nextStateName: NextStateName<D, A, E>, action: A) {
     if (!nextStateName) return;
     const nextState = desc[nextStateName];
     if (!nextState) throw Error(`Invalid state name ${nextStateName}`);

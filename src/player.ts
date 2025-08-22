@@ -4,7 +4,7 @@ import { getTilesetTextureIndex, gridSize } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
-import { dictMap } from "./utils/helpers";
+import { match } from "./utils/helpers";
 
 export enum Action {
   None,
@@ -15,11 +15,27 @@ export enum Action {
   ReleaseRope,
 }
 
+interface FsmData {
+  player: Player;
+  update: () => void;
+}
+
+interface ExtraStateMethods {
+  input(input: string): Action;
+}
+
+const DEFAULT_KEYMAP = {
+  ArrowRight: Action.Right,
+  ArrowLeft: Action.Left,
+  Space: Action.Jump,
+  KeyE: Action.ShootRope,
+  default: Action.None,
+};
 export class Player extends e.EngineObject {
   rope: Rope | null = null;
   textureIndex = getTilesetTextureIndex("Cat");
   SPEED: number = 0.09;
-  AIR_CONTROL: number = 0.001;
+  AIR_CONTROL: number = 0.005;
   lastPos: [e.Vector2, e.Vector2];
   animationFrame: number = 0;
   animationTimer: number = 0;
@@ -33,7 +49,7 @@ export class Player extends e.EngineObject {
   ropeAngularVelocity: number = 0; // Angular velocity of the pendulum
   ropeLength: number = 0; // Length of the rope
 
-  stateMachine: StateMachineInstance<{ update: () => void }, Action> =
+  stateMachine: StateMachineInstance<{ update: () => void }, Action, ExtraStateMethods> =
     this.initStateMachine();
 
   shouldMirror() {
@@ -118,9 +134,12 @@ export class Player extends e.EngineObject {
   }
 
   initStateMachine() {
-    return stateMachine(
+    return stateMachine<FsmData, Action, ExtraStateMethods>(
       {
         idle: {
+          input(input): Action {
+            return match(DEFAULT_KEYMAP, input);
+          },
           update({ player: p, update }, action) {
             update();
             if (action == Action.ShootRope) return "rope";
@@ -136,14 +155,18 @@ export class Player extends e.EngineObject {
         },
 
         walk: {
+          input(input): Action {
+            return match(DEFAULT_KEYMAP, input);
+          },
           update({ player: p, update }, action: Action) {
             update();
             if (action == Action.ShootRope) return "rope";
             if (action == Action.None) return "idle";
             if (action == Action.Jump) return "jump";
+            if (!p.groundObject) return "falling";
 
             p.velocity.x =
-              dictMap(
+              match(
                 { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
                 action,
               ) * p.SPEED;
@@ -163,6 +186,17 @@ export class Player extends e.EngineObject {
         },
 
         jump: {
+          input(input): Action {
+            return match(
+              {
+                ArrowLeft: Action.Left,
+                ArrowRight: Action.Right,
+                KeyE: Action.ShootRope,
+                default: Action.None,
+              },
+              input,
+            );
+          },
           enter({ player: p }, action) {
             p.applyAcceleration(vec2(0, 0.3));
           },
@@ -171,6 +205,17 @@ export class Player extends e.EngineObject {
           },
         },
         falling: {
+          input(input): Action {
+            return match(
+              {
+                ArrowLeft: Action.Left,
+                ArrowRight: Action.Right,
+                KeyE: Action.ShootRope,
+                default: Action.None,
+              },
+              input,
+            );
+          },
           update({ player: p, update }, action: Action) {
             update();
             if (action == Action.ShootRope) return "rope";
@@ -178,18 +223,26 @@ export class Player extends e.EngineObject {
 
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
 
-            p.applyAcceleration(
-              vec2(
-                dictMap(
-                  { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
-                  action,
-                ) * p.AIR_CONTROL,
-                0,
-              ),
-            );
+            // Apply air control as position offset
+            p.velocity.x +=
+              match(
+                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+                action,
+              ) * p.AIR_CONTROL;
           },
         },
         rope: {
+          input(input): Action {
+            return match(
+              {
+                ArrowLeft: Action.Left,
+                ArrowRight: Action.Right,
+                KeyQ: Action.ReleaseRope,
+                default: Action.None,
+              },
+              input,
+            );
+          },
           enter({ player: p }, action) {
             if (!p.shootRope()) return "falling";
             p.snapPosition();
@@ -223,7 +276,7 @@ export class Player extends e.EngineObject {
             // Handle player input for swing control
             const swingForce = 0.001;
             p.ropeAngularVelocity +=
-              dictMap(
+              match(
                 { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
                 action,
               ) * swingForce;

@@ -34,7 +34,7 @@ const DEFAULT_KEYMAP = {
 export class Player extends e.EngineObject {
   rope: Rope | null = null;
   textureIndex = getTilesetTextureIndex("Cat");
-  SPEED: number = 0.09;
+  SPEED: number = 0.12;
   AIR_CONTROL: number = 0.005;
   lastPos: [e.Vector2, e.Vector2];
   animationFrame: number = 0;
@@ -49,8 +49,11 @@ export class Player extends e.EngineObject {
   ropeAngularVelocity: number = 0; // Angular velocity of the pendulum
   ropeLength: number = 0; // Length of the rope
 
-  stateMachine: StateMachineInstance<{ update: () => void }, Action, ExtraStateMethods> =
-    this.initStateMachine();
+  stateMachine: StateMachineInstance<
+    { update: () => void },
+    Action,
+    ExtraStateMethods
+  > = this.initStateMachine();
 
   shouldMirror() {
     const [prev, now] = this.lastPos;

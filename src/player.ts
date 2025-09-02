@@ -186,7 +186,14 @@ export class Player extends e.EngineObject {
         },
         rope: {
           input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
+            return match(
+              {
+                ...DEFAULT_KEYMAP,
+                Space: Action.ReleaseRope,
+                LeftMouse: Action.ReleaseRope,
+              },
+              input,
+            );
           },
           enter({ player: p }, action) {
             p.snapPosition();

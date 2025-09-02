@@ -5,7 +5,7 @@ import { Player } from "./player";
 export class Rope extends e.EngineObject {
   static SHOOT_SPEED = 1;
   private end: e.Vector2;
-  private anchor: e.Vector2 | null = null;
+  public readonly anchor: e.Vector2 | null = null;
   private shootTravel: number = 0;
   private shootDuration: number = 0;
   constructor(
@@ -29,6 +29,14 @@ export class Rope extends e.EngineObject {
     return this.willHit && this.percentDone >= 1;
   }
 
+  get hasMissed(): boolean {
+    return !this.willHit && this.percentDone >= 1;
+  }
+
+  get length(): number {
+    return this.end.distance(this.start.pos);
+  }
+
   update(): void {
     this.shootTravel += 1;
   }
@@ -42,7 +50,7 @@ export class Rope extends e.EngineObject {
       this.start.pos,
       this.start.pos.lerp(this.end, this.percentDone),
       0.1,
-      e.RED,
+      e.BLACK,
     );
   }
 }

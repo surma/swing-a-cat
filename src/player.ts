@@ -105,6 +105,7 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action) {
             update();
+            if (p.rope?.hasHit) return "rope";
             if (action == Action.ShootRope) p.shootRope();
             if (action == Action.ReleaseRope) p.releaseRope();
             if (action == Action.Jump) return "jump";
@@ -125,6 +126,7 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action: Action) {
             update();
+            if (p.rope?.hasHit) return "rope";
             if (action == Action.ShootRope) p.shootRope();
             if (action == Action.ReleaseRope) p.releaseRope();
             if (action == Action.None) return "idle";
@@ -168,6 +170,7 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action: Action) {
             update();
+            if (p.rope?.hasHit) return "rope";
             if (action == Action.ShootRope) p.shootRope();
             if (action == Action.ReleaseRope) p.releaseRope();
             if (p.groundObject) return "idle";
@@ -186,10 +189,9 @@ export class Player extends e.EngineObject {
             return match(DEFAULT_KEYMAP, input);
           },
           enter({ player: p }, action) {
-            // if (!p.shootRope()) return "falling";
             p.snapPosition();
 
-            const ropeVector = p.pos.subtract(p.rope!.pos);
+            const ropeVector = p.pos.subtract(p.rope!.anchor!);
             p.ropeLength = ropeVector.length();
             p.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
 
@@ -215,8 +217,8 @@ export class Player extends e.EngineObject {
               ) * swingForce;
 
             const newPos = vec2(
-              p.rope!.pos.x + p.ropeLength * Math.sin(p.ropeAngle),
-              p.rope!.pos.y - p.ropeLength * Math.cos(p.ropeAngle),
+              p.rope!.anchor!.x + p.ropeLength * Math.sin(p.ropeAngle),
+              p.rope!.anchor!.y - p.ropeLength * Math.cos(p.ropeAngle),
             );
 
             const oldPos = p.pos.copy();
@@ -245,15 +247,14 @@ export class Player extends e.EngineObject {
   update(): void {
     this.stateMachine.action(this.nextAction ?? Action.None);
     this.nextAction = null;
+    if (this.rope?.hasMissed) this.releaseRope();
     this.updateLastPos();
     this.updateMirror();
   }
 
   snapPosition(): void {
-    const MAX_LENGTH = 6;
-    if (!this.rope) return;
-    const dir = this.pos.subtract(this.rope.pos);
-    if (dir.length() < MAX_LENGTH) return;
-    this.pos = this.rope.pos.add(dir.normalize().scale(MAX_LENGTH));
+    if (!this.rope?.hasHit) return;
+    const dir = this.pos.subtract(this.rope.anchor!);
+    this.pos = this.rope.anchor!.add(dir.normalize().scale(this.rope.length));
   }
 }

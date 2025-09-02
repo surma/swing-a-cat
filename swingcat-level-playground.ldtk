@@ -941,7 +941,7 @@
 			"tileRect": null,
 			"uiTileRect": null,
 			"nineSliceBorders": [],
-			"maxCount": 1,
+			"maxCount": 5,
 			"limitScope": "PerLevel",
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0.5,
@@ -1128,6 +1128,34 @@
 							"height": 8,
 							"defUid": 168,
 							"px": [28,500],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Clover3",
+							"__grid": [67,33],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#35C040",
+							"iid": "dc194db0-8560-11f0-bb4d-d38fc7c454b5",
+							"width": 8,
+							"height": 8,
+							"defUid": 167,
+							"px": [540,268],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Clover3",
+							"__grid": [76,35],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#35C040",
+							"iid": "dcd2b2a0-8560-11f0-bb4d-cb5705cca594",
+							"width": 8,
+							"height": 8,
+							"defUid": 167,
+							"px": [612,284],
 							"fieldInstances": []
 						}
 					]

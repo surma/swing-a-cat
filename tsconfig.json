@@ -5,6 +5,7 @@
     // "lib": [],
     "module": "esnext",
     "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     // "types": [],
     "allowJs": true,
     "noEmit": true,

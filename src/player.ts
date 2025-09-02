@@ -5,6 +5,7 @@ import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
 import { match } from "./utils/helpers";
+import { leap, meow } from "./sounds";
 
 export enum Action {
   None,
@@ -79,6 +80,7 @@ export class Player extends e.EngineObject {
 
   shootRope() {
     if (this.rope) return;
+    meow.play();
     this.rope = new Rope(this, e.mousePos.subtract(this.pos), 10);
   }
 
@@ -158,6 +160,7 @@ export class Player extends e.EngineObject {
             return match(DEFAULT_KEYMAP, input);
           },
           enter({ player: p }, action) {
+            leap.play();
             p.applyAcceleration(vec2(0, 0.3));
           },
           update(data, action: Action) {

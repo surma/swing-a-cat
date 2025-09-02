@@ -50,6 +50,11 @@ function gameUpdatePost() {
       p.action(p.stateMachine.currentState.input(key));
     }
   }
+
+  if (e.mouseWasPressed(0))
+    p.action(p.stateMachine.currentState.input("LeftMouse"));
+  if (e.mouseWasPressed(2))
+    p.action(p.stateMachine.currentState.input("RightMouse"));
 }
 
 function gameRender() {}

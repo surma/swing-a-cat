@@ -33,6 +33,8 @@ const DEFAULT_KEYMAP = {
   ArrowDown: Action.Down,
   Space: Action.Jump,
   KeyE: Action.ShootRope,
+  LeftMouse: Action.ShootRope,
+  RightMouse: Action.ReleaseRope,
   default: Action.None,
 };
 export class Player extends e.EngineObject {
@@ -159,15 +161,7 @@ export class Player extends e.EngineObject {
 
         jump: {
           input(input): Action {
-            return match(
-              {
-                ArrowLeft: Action.Left,
-                ArrowRight: Action.Right,
-                KeyE: Action.ShootRope,
-                default: Action.None,
-              },
-              input,
-            );
+            return match(DEFAULT_KEYMAP, input);
           },
           enter({ player: p }, action) {
             p.applyAcceleration(vec2(0, 0.3));
@@ -178,15 +172,7 @@ export class Player extends e.EngineObject {
         },
         falling: {
           input(input): Action {
-            return match(
-              {
-                ArrowLeft: Action.Left,
-                ArrowRight: Action.Right,
-                KeyE: Action.ShootRope,
-                default: Action.None,
-              },
-              input,
-            );
+            return match(DEFAULT_KEYMAP, input);
           },
           update({ player: p, update }, action: Action) {
             update();
@@ -204,15 +190,7 @@ export class Player extends e.EngineObject {
         },
         rope: {
           input(input): Action {
-            return match(
-              {
-                ArrowLeft: Action.Left,
-                ArrowRight: Action.Right,
-                KeyQ: Action.ReleaseRope,
-                default: Action.None,
-              },
-              input,
-            );
+            return match(DEFAULT_KEYMAP, input);
           },
           enter({ player: p }, action) {
             if (!p.shootRope()) return "falling";

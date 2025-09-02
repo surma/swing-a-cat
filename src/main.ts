@@ -44,7 +44,7 @@ function gameInit() {
 function gameUpdate() {}
 
 function gameUpdatePost() {
-  const KEYS = Object.keys(DEFAULT_KEYMAP);
+  const KEYS = [...Object.keys(DEFAULT_KEYMAP), "ArrowUp", "ArrowDown"];
   for (const key of KEYS) {
     if (e.keyIsDown(key)) {
       p.action(p.stateMachine.currentState.input(key));

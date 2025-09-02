@@ -35,8 +35,6 @@ export const DEFAULT_KEYMAP = {
   KeyE: Action.ShootRope,
   LeftMouse: Action.ShootRope,
   RightMouse: Action.ReleaseRope,
-  ArrowUp: Action.ShortenRope,
-  ArrowDown: Action.LengthenRope,
   default: Action.None,
 };
 export class Player extends e.EngineObject {
@@ -191,6 +189,8 @@ export class Player extends e.EngineObject {
             return match(
               {
                 ...DEFAULT_KEYMAP,
+                ArrowUp: Action.ShortenRope,
+                ArrowDown: Action.LengthenRope,
                 Space: Action.ReleaseRope,
                 LeftMouse: Action.ReleaseRope,
               },

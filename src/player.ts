@@ -15,6 +15,8 @@ export enum Action {
   Jump,
   ShootRope,
   ReleaseRope,
+  ShortenRope,
+  LengthenRope,
 }
 
 interface FsmData {
@@ -26,15 +28,15 @@ interface ExtraStateMethods {
   input(input: string): Action;
 }
 
-const DEFAULT_KEYMAP = {
+export const DEFAULT_KEYMAP = {
   ArrowRight: Action.Right,
   ArrowLeft: Action.Left,
-  ArrowUp: Action.Up,
-  ArrowDown: Action.Down,
   Space: Action.Jump,
   KeyE: Action.ShootRope,
   LeftMouse: Action.ShootRope,
   RightMouse: Action.ReleaseRope,
+  ArrowUp: Action.ShortenRope,
+  ArrowDown: Action.LengthenRope,
   default: Action.None,
 };
 export class Player extends e.EngineObject {
@@ -71,25 +73,15 @@ export class Player extends e.EngineObject {
     this.mirror = this.shouldMirror() == -1;
   }
 
-  detachRope() {
+  releaseRope() {
     if (!this.rope) return;
     this.rope.destroy();
     this.rope = null;
   }
 
-  /**
-   * @returns {boolean} True if the rope hit something
-   */
   shootRope() {
-    this.detachRope();
-    const dir = e.mousePos.subtract(this.pos).normalize();
-    const ropeAnchor = e.tileCollisionRaycast(
-      this.pos,
-      this.pos.add(dir.scale(100)),
-    );
-    if (!ropeAnchor) return false;
-    this.rope = new Rope(ropeAnchor, this);
-    return true;
+    if (this.rope) return;
+    this.rope = new Rope(this, e.mousePos.subtract(this.pos), 10);
   }
 
   constructor(pos: e.Vector2) {
@@ -115,7 +107,9 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action) {
             update();
-            if (action == Action.ShootRope) return "rope";
+            if (p.rope?.hasHit) return "rope";
+            if (action == Action.ShootRope) p.shootRope();
+            if (action == Action.ReleaseRope) p.releaseRope();
             if (action == Action.Jump) return "jump";
             if (!p.groundObject) return "falling";
 
@@ -134,7 +128,9 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action: Action) {
             update();
-            if (action == Action.ShootRope) return "rope";
+            if (p.rope?.hasHit) return "rope";
+            if (action == Action.ShootRope) p.shootRope();
+            if (action == Action.ReleaseRope) p.releaseRope();
             if (action == Action.None) return "idle";
             if (action == Action.Jump) return "jump";
             if (!p.groundObject) return "falling";
@@ -176,7 +172,9 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action: Action) {
             update();
-            if (action == Action.ShootRope) return "rope";
+            if (p.rope?.hasHit) return "rope";
+            if (action == Action.ShootRope) p.shootRope();
+            if (action == Action.ReleaseRope) p.releaseRope();
             if (p.groundObject) return "idle";
 
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
@@ -190,14 +188,19 @@ export class Player extends e.EngineObject {
         },
         rope: {
           input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
+            return match(
+              {
+                ...DEFAULT_KEYMAP,
+                Space: Action.ReleaseRope,
+                LeftMouse: Action.ReleaseRope,
+              },
+              input,
+            );
           },
           enter({ player: p }, action) {
-            if (!p.shootRope()) return "falling";
-            p.snapPosition();
+            p.snapPositionToRope();
 
-            const ropeVector = p.pos.subtract(p.rope!.pos);
-            p.ropeLength = ropeVector.length();
+            const ropeVector = p.pos.subtract(p.rope!.anchor!);
             p.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
 
             const tangent = ropeVector.normalize().rotate(-90);
@@ -206,9 +209,14 @@ export class Player extends e.EngineObject {
           update({ player: p }, action: Action) {
             if (action == Action.ReleaseRope) return "falling";
 
+            if (action == Action.ShortenRope) p.rope!.length -= 0.1;
+            if (action == Action.LengthenRope) p.rope!.length += 0.1;
+            if (action == Action.ShortenRope || action == Action.LengthenRope)
+              p.snapPositionToRope();
+
             const damping = 0.99;
             const angularAcceleration =
-              -((-1 * e.gravity) / p.ropeLength) * Math.sin(p.ropeAngle);
+              -((-1 * e.gravity) / p.rope!.length) * Math.sin(p.ropeAngle);
 
             p.ropeAngularVelocity += angularAcceleration;
             p.ropeAngularVelocity *= damping;
@@ -222,8 +230,8 @@ export class Player extends e.EngineObject {
               ) * swingForce;
 
             const newPos = vec2(
-              p.rope!.pos.x + p.ropeLength * Math.sin(p.ropeAngle),
-              p.rope!.pos.y - p.ropeLength * Math.cos(p.ropeAngle),
+              p.rope!.anchor!.x + p.rope!.length * Math.sin(p.ropeAngle),
+              p.rope!.anchor!.y - p.rope!.length * Math.cos(p.ropeAngle),
             );
 
             const oldPos = p.pos.copy();
@@ -237,7 +245,7 @@ export class Player extends e.EngineObject {
             p.velocity = p.pos.subtract(oldPos);
           },
           exit({ player }, action) {
-            player.detachRope();
+            player.releaseRope();
           },
         },
       },
@@ -252,15 +260,14 @@ export class Player extends e.EngineObject {
   update(): void {
     this.stateMachine.action(this.nextAction ?? Action.None);
     this.nextAction = null;
+    if (this.rope?.hasMissed) this.releaseRope();
     this.updateLastPos();
     this.updateMirror();
   }
 
-  snapPosition(): void {
-    const MAX_LENGTH = 6;
-    if (!this.rope) return;
-    const dir = this.pos.subtract(this.rope.pos);
-    if (dir.length() < MAX_LENGTH) return;
-    this.pos = this.rope.pos.add(dir.normalize().scale(MAX_LENGTH));
+  snapPositionToRope(): void {
+    if (!this.rope?.hasHit) return;
+    const dir = this.pos.subtract(this.rope.anchor!);
+    this.pos = this.rope.anchor!.add(dir.normalize().scale(this.rope.length));
   }
 }

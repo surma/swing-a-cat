@@ -12,7 +12,7 @@ import stateMachine, {
   StateMachine,
   StateMachineInstance,
 } from "./state-machine";
-import { Action, Player } from "./player";
+import { Action, DEFAULT_KEYMAP, Player } from "./player";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
@@ -44,7 +44,7 @@ function gameInit() {
 function gameUpdate() {}
 
 function gameUpdatePost() {
-  const KEYS = ["ArrowRight", "ArrowLeft", "Space", "KeyE", "KeyQ"];
+  const KEYS = Object.keys(DEFAULT_KEYMAP);
   for (const key of KEYS) {
     if (e.keyIsDown(key)) {
       p.action(p.stateMachine.currentState.input(key));

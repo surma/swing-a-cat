@@ -1101,6 +1101,34 @@
 							"defUid": 113,
 							"px": [28,60],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "Clover3",
+							"__grid": [86,36],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#35C040",
+							"iid": "b0d763d0-8560-11f0-bb4d-7b31515135ec",
+							"width": 8,
+							"height": 8,
+							"defUid": 167,
+							"px": [692,292],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Clover4",
+							"__grid": [3,62],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#00F513",
+							"iid": "b2b6d230-8560-11f0-bb4d-9d66552e6e37",
+							"width": 8,
+							"height": 8,
+							"defUid": 168,
+							"px": [28,500],
+							"fieldInstances": []
 						}
 					]
 				},

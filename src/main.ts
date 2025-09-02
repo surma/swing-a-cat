@@ -19,7 +19,7 @@ type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 let p: Player;
 
 function gameInit() {
-  e.setCameraScale(gridSize * 1.5);
+  e.setCameraScale(gridSize * 3);
   // e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
   e.setGravity(-0.01);
@@ -32,16 +32,20 @@ function gameInit() {
   e.initTileCollision(vec2(90, 90));
 
   const { layer, spawnPos } = ldtkLevel("Level_1");
-  e.setCameraPos(layer.size.scale(0.5));
   layer.collideRaycast = true;
   layer.collideSolidObjects = true;
   layer.collideTiles = true;
   layer.redraw();
 
   p = new Player(spawnPos);
+  e.setCameraPos(spawnPos);
 }
 
-function gameUpdate() {}
+function gameUpdate() {
+  const CAMERA_LAG = 0.1;
+  const toPlayerVec = p.pos.subtract(e.cameraPos);
+  e.setCameraPos(e.cameraPos.add(toPlayerVec.scale(CAMERA_LAG)));
+}
 
 function gameUpdatePost() {
   const KEYS = [...Object.keys(DEFAULT_KEYMAP), "ArrowUp", "ArrowDown"];

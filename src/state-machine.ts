@@ -24,7 +24,7 @@ export interface StateMachineInstance<D, A, E = {}> {
 export default function stateMachine<D, A, E = {}>(
   desc: StateMachine<D, A, E>,
   data: D,
-): StateMachineInstance<D, A> {
+): StateMachineInstance<D, A, E> {
   let currentState = Object.values(desc)[0];
 
   function _handleNextState(nextStateName: NextStateName<D, A, E>, action: A) {

@@ -53,7 +53,7 @@ function generateModuleCode(file: types.LdtkFile, imports: string[]): string {
         ),
         entityInstances: layerInstance.entityInstances.map(
           (entityInstance) => ({
-            ...pick(entityInstance, "defUid", "__grid"),
+            ...pick(entityInstance, "defUid", "__grid", "__tile"),
           }),
         ),
       })),

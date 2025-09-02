@@ -4,7 +4,6 @@ import {
   ldtkLevel,
   gridSize,
   textures,
-  getTilesetTextureIndex,
 } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import "./music";

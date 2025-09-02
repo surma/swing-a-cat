@@ -1,6 +1,6 @@
 import * as e from "littlejsengine";
 import { vec2 } from "littlejsengine";
-import { LayerInstance, Level } from "../../ldtk/ldtk";
+import { EntityInstance, LayerInstance, Level } from "../../ldtk/ldtk";
 import ldtkFile from "../../swingcat-level-playground.ldtk";
 import { Maybe, must } from "./types";
 import { fromDOMPoint } from "./dommatrix";
@@ -38,13 +38,13 @@ export function getLayerDefinition(layerName: string) {
   return layerDef;
 }
 
-export function getTileset(tilesetUid: number) {
+export function getTilesetByUid(tilesetUid: number) {
   const tileset = ldtkFile.defs.tilesets.find((tile) => tile.uid == tilesetUid);
   if (!tileset) throw Error(`Unknown tileset ${tilesetUid}`);
   return tileset;
 }
 
-export function getTilesetByName(name: string) {
+export function getTilesetByIdent(name: string) {
   const tileset = ldtkFile.defs.tilesets.find(
     (tileset) => tileset.identifier === name,
   );
@@ -52,18 +52,30 @@ export function getTilesetByName(name: string) {
   return tileset;
 }
 
-export function getTilesetTextureIndex(tilesetName: string): number {
-  const tileset = getTilesetByName(tilesetName);
+export function getTilesetTextureIndexByIdent(tilesetName: string): number {
+  const tileset = getTilesetByIdent(tilesetName);
   const textureIndex = textures.indexOf(tileset.relPath);
   if (textureIndex === -1)
     throw Error(`Texture not found for tileset ${tilesetName}`);
   return textureIndex;
 }
 
+export function getTilesetTextureIndexByUid(tilesetUid: number): number {
+  const tileset = getTilesetByUid(tilesetUid);
+  const textureIndex = textures.indexOf(tileset.relPath);
+  if (textureIndex === -1)
+    throw Error(`Texture not found for tileset ${tilesetUid}`);
+  return textureIndex;
+}
+
 export function getEntityFromLayer(layer: LayerInstance, entityName: string) {
+  return getEntitiesFromLayer(layer, entityName)?.[0];
+}
+
+export function getEntitiesFromLayer(layer: LayerInstance, entityName: string) {
   const entityUid = entityDefs[entityName]?.uid;
   if (!entityUid) throw Error(`Unknown entity ${entityName}`);
-  const entity = layer.entityInstances.find(
+  const entity = layer.entityInstances.filter(
     (entity) => entity.defUid == entityUid,
   );
   if (!entity) throw Error(`Layer has no ${entityName} entity`);
@@ -80,9 +92,10 @@ export function ldtkLevel(name: string) {
     structureLayerDef.uid,
   );
   const entitiesLayer = getLayerInstanceFromLevel(level, entitiesLayerDef.uid);
-  const spawn = getEntityFromLayer(entitiesLayer, "Spawn");
 
-  const structureTileset = getTileset(must(structureLayerDef.tilesetDefUid));
+  const structureTileset = getTilesetByUid(
+    must(structureLayerDef.tilesetDefUid),
+  );
 
   const textureIndex = textures.indexOf(structureTileset.relPath);
 
@@ -95,22 +108,39 @@ export function ldtkLevel(name: string) {
   );
 
   const m = new DOMMatrix().translateSelf(0, layer.size.y - 1).scaleSelf(1, -1);
+  function fromGridToWorld(obj: number[]) {
+    return fromDOMPoint(m.transformPoint(vec2(...obj))).add(vec2(0.5, 0.5));
+  }
 
-  const spawnPos = fromDOMPoint(m.transformPoint(vec2(...spawn.__grid))).add(
-    vec2(0.5, 0.5),
-  );
+  const entities = entitiesLayer.entityInstances.flatMap((entity) => {
+    if (!entity.__tile) return [];
+    const textureIndex = getTilesetTextureIndexByUid(entity.__tile.tilesetUid);
+    const obj = new e.EngineObject(fromGridToWorld(entity.__grid), vec2(1));
+    obj.mass = 0;
+    obj.collideSolidObjects = false;
+    obj.collideTiles = false;
+    obj.collideRaycast = false;
+    obj.color = e.GREEN;
+    obj.tileInfo = new e.TileInfo(
+      vec2(entity.__tile.x, entity.__tile.y),
+      vec2(gridSize),
+      textureIndex,
+    );
+    return [obj];
+  });
+  const spawn = getEntityFromLayer(entitiesLayer, "Spawn");
+  const spawnPos = fromGridToWorld(spawn.__grid);
 
   // Process auto-layer tiles if they exist
   if (!(structureLayer.autoLayerTiles?.length > 0))
     throw Error("Structure layer does not have auto tiles");
   for (const autoTile of structureLayer.autoLayerTiles) {
-    const tilePosX = Math.floor(autoTile.px[0] / gridSize);
-    const tilePosY = Math.floor(autoTile.px[1] / gridSize);
-    const ldtkCoordinate = vec2(tilePosX, tilePosY);
-    const tileGridCoordinate = fromDOMPoint(m.transformPoint(ldtkCoordinate));
-    const centerBasedCoordinate = tileGridCoordinate.add(vec2(0.5, 0.5));
+    const tilePos = vec2(...autoTile.px)
+      .scale(1 / gridSize)
+      .floor();
+    const tileCoordinate = fromGridToWorld([tilePos.x, tilePos.y]);
 
-    const data = layer.getData(centerBasedCoordinate);
+    const data = layer.getData(tileCoordinate);
     // Calculate tile coordinates in the tileset
     const srcX = autoTile.src[0];
     const srcY = autoTile.src[1];
@@ -121,8 +151,8 @@ export function ldtkLevel(name: string) {
     data.tile = tileIndex;
 
     // Set collision for solid tiles
-    e.setTileCollisionData(centerBasedCoordinate, 1);
+    e.setTileCollisionData(tileCoordinate, 1);
   }
 
-  return { layer, spawnPos };
+  return { layer, spawnPos, entities };
 }

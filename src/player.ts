@@ -1,6 +1,6 @@
 import * as e from "littlejsengine";
 import { Rope } from "./rope";
-import { getTilesetTextureIndex, gridSize } from "./utils/ldtk";
+import { getTilesetTextureIndexByIdent, gridSize } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
@@ -39,7 +39,7 @@ export const DEFAULT_KEYMAP = {
 };
 export class Player extends e.EngineObject {
   rope: Rope | null = null;
-  textureIndex = getTilesetTextureIndex("Cat");
+  textureIndex = getTilesetTextureIndexByIdent("Cat");
   SPEED: number = 0.12;
   AIR_CONTROL: number = 0.005;
   lastPos: [e.Vector2, e.Vector2];
@@ -89,7 +89,7 @@ export class Player extends e.EngineObject {
     this.size = vec2(1, 1);
 
     // Get Cat tileset texture index and create tile reference
-    const catTextureIndex = getTilesetTextureIndex("Cat");
+    const catTextureIndex = getTilesetTextureIndexByIdent("Cat");
     this.tileInfo = tile(0, vec2(gridSize), catTextureIndex, 1);
 
     this.collideTiles = true;

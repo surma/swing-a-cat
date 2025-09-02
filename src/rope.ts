@@ -1,6 +1,7 @@
 import * as e from "littlejsengine";
 import { vec2 } from "littlejsengine";
 import { Player } from "./player";
+import { clamp } from "./utils/helpers";
 
 export class Rope extends e.EngineObject {
   static SHOOT_SPEED = 1;
@@ -35,6 +36,19 @@ export class Rope extends e.EngineObject {
 
   get length(): number {
     return this.end.distance(this.start.pos);
+  }
+
+  get direction() {
+    if (!this.anchor) return null;
+    return this.start.pos.subtract(this.anchor);
+  }
+
+  set length(newLength: number) {
+    newLength = clamp({ v: newLength, max: this.maxLength });
+    if (!this.anchor) throw Error("Trying to set length on a non-hitting rope");
+    this.start.pos = this.anchor.add(
+      this.direction!.normalize().scale(newLength),
+    );
   }
 
   update(): void {

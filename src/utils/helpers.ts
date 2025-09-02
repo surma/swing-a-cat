@@ -7,3 +7,13 @@ export function match<K extends keyof any, V>(
   if (typeof f === "function") f = f(v);
   return f;
 }
+
+export function clamp({
+  min = Number.NEGATIVE_INFINITY,
+  max = Number.EPSILON,
+  v,
+}) {
+  if (v > max) return max;
+  if (v < min) return min;
+  return v;
+}

@@ -71,25 +71,15 @@ export class Player extends e.EngineObject {
     this.mirror = this.shouldMirror() == -1;
   }
 
-  detachRope() {
+  releaseRope() {
     if (!this.rope) return;
     this.rope.destroy();
     this.rope = null;
   }
 
-  /**
-   * @returns {boolean} True if the rope hit something
-   */
   shootRope() {
-    this.detachRope();
-    const dir = e.mousePos.subtract(this.pos).normalize();
-    const ropeAnchor = e.tileCollisionRaycast(
-      this.pos,
-      this.pos.add(dir.scale(100)),
-    );
-    if (!ropeAnchor) return false;
-    this.rope = new Rope(ropeAnchor, this);
-    return true;
+    if (this.rope) return;
+    this.rope = new Rope(this, e.mousePos.subtract(this.pos), 10);
   }
 
   constructor(pos: e.Vector2) {
@@ -115,7 +105,8 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action) {
             update();
-            if (action == Action.ShootRope) return "rope";
+            if (action == Action.ShootRope) p.shootRope();
+            if (action == Action.ReleaseRope) p.releaseRope();
             if (action == Action.Jump) return "jump";
             if (!p.groundObject) return "falling";
 
@@ -134,7 +125,8 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action: Action) {
             update();
-            if (action == Action.ShootRope) return "rope";
+            if (action == Action.ShootRope) p.shootRope();
+            if (action == Action.ReleaseRope) p.releaseRope();
             if (action == Action.None) return "idle";
             if (action == Action.Jump) return "jump";
             if (!p.groundObject) return "falling";
@@ -176,7 +168,8 @@ export class Player extends e.EngineObject {
           },
           update({ player: p, update }, action: Action) {
             update();
-            if (action == Action.ShootRope) return "rope";
+            if (action == Action.ShootRope) p.shootRope();
+            if (action == Action.ReleaseRope) p.releaseRope();
             if (p.groundObject) return "idle";
 
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
@@ -193,7 +186,7 @@ export class Player extends e.EngineObject {
             return match(DEFAULT_KEYMAP, input);
           },
           enter({ player: p }, action) {
-            if (!p.shootRope()) return "falling";
+            // if (!p.shootRope()) return "falling";
             p.snapPosition();
 
             const ropeVector = p.pos.subtract(p.rope!.pos);
@@ -237,7 +230,7 @@ export class Player extends e.EngineObject {
             p.velocity = p.pos.subtract(oldPos);
           },
           exit({ player }, action) {
-            player.detachRope();
+            player.releaseRope();
           },
         },
       },

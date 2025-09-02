@@ -1,17 +1,48 @@
 import * as e from "littlejsengine";
 import { vec2 } from "littlejsengine";
+import { Player } from "./player";
 
 export class Rope extends e.EngineObject {
+  static SHOOT_SPEED = 1;
+  private end: e.Vector2;
+  private anchor: e.Vector2 | null = null;
+  private shootTravel: number = 0;
+  private shootDuration: number = 0;
   constructor(
-    pos: e.Vector2,
-    private player: e.EngineObject,
+    public readonly start: e.EngineObject,
+    direction: e.Vector2,
+    public readonly maxLength: number,
   ) {
-    super(pos, vec2(1, 1));
+    super(start.pos, vec2(1, 1));
+    direction = direction.normalize();
+    this.end = start.pos.add(direction.scale(maxLength));
+    this.anchor = e.tileCollisionRaycast(start.pos, this.end);
+    if (this.anchor) this.end = this.anchor;
+    this.shootDuration = this.end.distance(start.pos) * Rope.SHOOT_SPEED;
   }
 
-  update(): void {}
+  get willHit(): boolean {
+    return !!this.anchor;
+  }
+
+  get hasHit(): boolean {
+    return this.willHit && this.percentDone >= 1;
+  }
+
+  update(): void {
+    this.shootTravel += 1;
+  }
+
+  get percentDone() {
+    return this.shootTravel / this.shootDuration;
+  }
 
   render(): void {
-    e.drawLine(this.player.pos, this.pos, 0.1, e.RED);
+    e.drawLine(
+      this.start.pos,
+      this.start.pos.lerp(this.end, this.percentDone),
+      0.1,
+      e.RED,
+    );
   }
 }

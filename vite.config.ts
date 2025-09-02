@@ -5,6 +5,7 @@ export default defineConfig({
   build: {
     minify: "terser",
     target: "esnext",
+    sourcemap: true,
   },
   plugins: [
     ldtkLoaderPlugin(),

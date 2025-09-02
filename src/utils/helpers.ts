@@ -17,3 +17,10 @@ export function clamp({
   if (v < min) return min;
   return v;
 }
+
+export function pick<T, K extends Array<keyof T>>(obj: T, ...keys: K): T {
+  const keyset = new Set(keys);
+  return Object.fromEntries(
+    Object.entries(obj).filter(([k, v]) => keyset.has(k)),
+  );
+}

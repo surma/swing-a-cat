@@ -2,6 +2,7 @@ import { PluginOption } from "vite";
 import * as types from "./ldtk";
 import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
+import { pick } from "../src/utils/helpers";
 
 function texturePlaceholder(id: number): string {
   return `__TEXTURE_PLACEHOLDER_${id}`;
@@ -30,14 +31,36 @@ function processTextures(content: types.LdtkFile): string[] {
 }
 
 function generateModuleCode(file: types.LdtkFile, imports: string[]): string {
-  let jsonString = JSON.stringify(
-    {
-      ...file,
+  const subsetLevel = {
+    defaultGridSize: file.defaultGridSize,
+    defs: {
+      layers: file.defs.layers.map((layer) =>
+        pick(layer, "identifier", "uid", "tilesetDefUid"),
+      ),
+      entities: file.defs.entities.map((entity) =>
+        pick(entity, "uid", "identifier"),
+      ),
+      tilesets: file.defs.tilesets.map((tileset) =>
+        pick(tileset, "uid", "identifier", "relPath", "__cHei", "__cWid"),
+      ),
     },
-    null,
-    2,
-  );
+    levels: file.levels.map((level) => ({
+      ...pick(level, "uid", "identifier", "pxWid", "pxHei"),
+      layerInstances: (level.layerInstances ?? []).map((layerInstance) => ({
+        ...pick(layerInstance, "layerDefUid"),
+        autoLayerTiles: layerInstance.autoLayerTiles.map((tileInstance) =>
+          pick(tileInstance, "px", "src"),
+        ),
+        entityInstances: layerInstance.entityInstances.map(
+          (entityInstance) => ({
+            ...pick(entityInstance, "defUid", "__grid"),
+          }),
+        ),
+      })),
+    })),
+  };
 
+  let jsonString = JSON.stringify(subsetLevel);
   // Replace the placeholder strings with actual import references
   for (const idx of imports.keys()) {
     jsonString = jsonString.replace(

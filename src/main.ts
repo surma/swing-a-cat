@@ -42,6 +42,10 @@ function gameInit() {
 }
 
 function gameUpdate() {
+  updateCamera();
+}
+
+function updateCamera() {
   const CAMERA_LAG = 0.1;
   const toPlayerVec = p.pos.subtract(e.cameraPos);
   e.setCameraPos(e.cameraPos.add(toPlayerVec.scale(CAMERA_LAG)));

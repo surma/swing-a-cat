@@ -1123,7 +1123,7 @@
 						},
 						{
 							"__identifier": "Clover3",
-							"__grid": [17,7],
+							"__grid": [55,11],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 169, "x": 9, "y": 0, "w": 9, "h": 9 },
@@ -1132,12 +1132,12 @@
 							"width": 8,
 							"height": 8,
 							"defUid": 167,
-							"px": [140,60],
+							"px": [444,92],
 							"fieldInstances": []
 						},
 						{
 							"__identifier": "Clover4",
-							"__grid": [41,8],
+							"__grid": [86,35],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 169, "x": 0, "y": 0, "w": 9, "h": 9 },
@@ -1146,7 +1146,7 @@
 							"width": 8,
 							"height": 8,
 							"defUid": 168,
-							"px": [332,68],
+							"px": [692,284],
 							"fieldInstances": []
 						}
 					]

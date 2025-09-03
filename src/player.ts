@@ -5,7 +5,7 @@ import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
 import { match } from "./utils/helpers";
-import { leap, meow } from "./sounds";
+import { leap, meow, clover } from "./sounds";
 
 export enum Action {
   None,

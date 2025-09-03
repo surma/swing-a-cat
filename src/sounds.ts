@@ -30,5 +30,6 @@ const toZzfxArray = (sound: any) => zzfxKeyOrder.map((key) => sound[key]);
 
 export const leap = new Sound(toZzfxArray(sounds[0]));
 export const meow = new Sound(toZzfxArray(sounds[1]));
+export const clover = new Sound(toZzfxArray(sounds[2]));
 
 

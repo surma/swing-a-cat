@@ -2,10 +2,14 @@ import * as e from "littlejsengine";
 import { Rope } from "./rope";
 import { getTilesetTextureIndexByIdent, gridSize } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
-import stateMachine, { StateMachineInstance } from "./state-machine";
+import stateMachine, {
+  StateMachine,
+  StateMachineInstance,
+} from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
 import { leap, meow, clover } from "./sounds";
 import { clamp, match, remap } from "./utils/helpers";
+import { Animation, makeAnimation } from "./animations";
 
 export enum Action {
   None,
@@ -40,23 +44,27 @@ export const DEFAULT_KEYMAP = {
 };
 export class Player extends e.EngineObject {
   rope: Rope | null = null;
-  textureIndex = getTilesetTextureIndexByIdent("Cat");
   SPEED: number = 0.12;
   AIR_CONTROL: number = 0.15;
   lastPos: [e.Vector2, e.Vector2];
-  animationFrame: number = 0;
-  animationTimer: number = 0;
-  animationSpeed: number = 0.1;
-  totalFrames: number = 4;
-  isMoving: boolean = false;
   nextAction: Maybe<Action> = null;
 
   ropeAngle: number = 0;
   ropeAngularVelocity: number = 0;
   ropeLength: number = 0;
 
-  stateMachine: StateMachineInstance<FsmData, Action, ExtraStateMethods> =
-    this.initStateMachine();
+  animations: Record<string, Animation> = {
+    idle: makeAnimation("All_images", 8, 0.1, 40),
+    walk: makeAnimation("All_images", 4, 0.1, 48),
+  };
+  currentAnimation: Animation = this.animations.idle;
+  animationTimer: number = 0;
+  animationFrame: number = 0;
+  idleTimer: number = 0;
+  idleDelay: number = 2; // 2 seconds
+
+  _states: StateMachine<FsmData, Action, ExtraStateMethods>;
+  stateMachine: StateMachineInstance<FsmData, Action, ExtraStateMethods>;
 
   shouldMirror() {
     const [prev, now] = this.lastPos;
@@ -89,183 +97,208 @@ export class Player extends e.EngineObject {
     this.lastPos = [pos.copy(), pos.copy()];
     this.size = vec2(1, 1);
 
+    this._states = {
+      idle: {
+        enter: ({ player: p }) => {
+          p.idleTimer = 0;
+        },
+        exit: ({ player: p }) => {
+          p.idleTimer = 0;
+        },
+        input(input): Action {
+          return match(DEFAULT_KEYMAP, input);
+        },
+                  update: ({ player: p, update }, action) => {
+                    update();
+                    p.idleTimer += e.timeDelta;
+                    if (p.idleTimer < p.idleDelay) {
+                      p.tileInfo = tile(
+                        48,
+                        vec2(gridSize),
+                        p.animations.walk.textureIndex,
+                        1,
+                      );
+                    } else {
+                      p.currentAnimation = p.animations.idle;
+                    }
+        
+                    if (p.rope?.hasHit) return "rope";
+                    if (action == Action.ShootRope) p.shootRope();
+                    if (action == Action.ReleaseRope) p.releaseRope();
+                    if (action == Action.Jump) return "jump";
+                    if (!p.groundObject) return "falling";
+        
+                    p.velocity = vec2(0);
+        
+                    p.mirror = action == Action.Left;
+                    if (action == Action.Left) return "walk";
+                    if (action == Action.Right) return "walk";
+                  },      },
+
+      walk: {
+        enter: ({ player: p }) => {
+          p.currentAnimation = p.animations.walk;
+        },
+        input(input): Action {
+          return match(DEFAULT_KEYMAP, input);
+        },
+        update: ({ player: p, update }, action: Action) => {
+          update();
+          if (p.rope?.hasHit) return "rope";
+          if (action == Action.ShootRope) p.shootRope();
+          if (action == Action.ReleaseRope) p.releaseRope();
+          if (action == Action.None) return "idle";
+          if (action == Action.Jump) return "jump";
+          if (!p.groundObject) return "falling";
+
+          p.velocity.x =
+            match(
+              { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+              action,
+            ) * p.SPEED;
+        },
+      },
+
+      jump: {
+        input(input): Action {
+          return match(DEFAULT_KEYMAP, input);
+        },
+        enter({ player: p }, action) {
+          p.applyAcceleration(vec2(0, 0.3));
+        },
+        update(data, action: Action) {
+          return "falling";
+        },
+      },
+      falling: {
+        input(input): Action {
+          return match(DEFAULT_KEYMAP, input);
+        },
+        update: ({ player: p, update }, action: Action) => {
+          update();
+          if (p.rope?.hasHit) return "rope";
+          if (action == Action.ShootRope) p.shootRope();
+          if (action == Action.ReleaseRope) p.releaseRope();
+          if (p.groundObject) return "idle";
+
+                      p.tileInfo = tile(
+                        48,
+                        vec2(gridSize),
+                        p.animations.walk.textureIndex,
+                        0,
+                      );
+          const factor = match(
+            { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+            action,
+          );
+          p.applyForce(
+            vec2(
+              factor *
+                remap({
+                  vin: { min: 0, max: factor },
+                  vout: { min: p.AIR_CONTROL, max: 0 },
+                  v: p.velocity.x / p.AIR_CONTROL,
+                }),
+              0,
+            ),
+          );
+        },
+      },
+      rope: {
+        input(input): Action {
+          return match(
+            {
+              ...DEFAULT_KEYMAP,
+              ArrowUp: Action.ShortenRope,
+              ArrowDown: Action.LengthenRope,
+              Space: Action.ReleaseRope,
+              LeftMouse: Action.ReleaseRope,
+            },
+            input,
+          );
+        },
+        enter({ player: p }, action) {
+          p.snapPositionToRope();
+
+          const ropeVector = p.pos.subtract(p.rope!.anchor!);
+          p.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
+
+          const tangent = ropeVector.normalize().rotate(-90);
+          p.velocity = p.velocity.normalize().scale(p.velocity.dot(tangent));
+        },
+        update: ({ player: p }, action: Action) => {
+          if (action == Action.ReleaseRope) return "falling";
+
+          if (action == Action.ShortenRope) p.rope!.length -= 0.1;
+          if (action == Action.LengthenRope) p.rope!.length += 0.1;
+          if (action == Action.ShortenRope || action == Action.LengthenRope)
+            p.snapPositionToRope();
+
+          const damping = 0.99;
+          const angularAcceleration =
+            -((-1 * e.gravity) / p.rope!.length) * Math.sin(p.ropeAngle);
+
+          p.ropeAngularVelocity += angularAcceleration;
+          p.ropeAngularVelocity *= damping;
+          p.ropeAngle += p.ropeAngularVelocity;
+
+          const swingForce = 0.001;
+          p.ropeAngularVelocity +=
+            match(
+              { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+              action,
+            ) * swingForce;
+
+          const newPos = vec2(
+            p.rope!.anchor!.x + p.rope!.length * Math.sin(p.ropeAngle),
+            p.rope!.anchor!.y - p.rope!.length * Math.cos(p.ropeAngle),
+          );
+
+          const oldPos = p.pos.copy();
+          p.pos = newPos;
+          const collision = e.tileCollisionRaycast(oldPos, p.pos);
+          if (collision) {
+            p.pos = oldPos;
+            p.ropeAngularVelocity *= -1;
+          }
+
+          p.velocity = p.pos.subtract(oldPos);
+        },
+        exit({ player }, action) {
+          player.releaseRope();
+        },
+      },
+    };
+
+    this.stateMachine = stateMachine(this._states, {
+      player: this,
+      update: () => super.update.call(this),
+    });
+
     // Get Cat tileset texture index and create tile reference
-    const catTextureIndex = getTilesetTextureIndexByIdent("Cat");
-    this.tileInfo = tile(0, vec2(gridSize), catTextureIndex, 1);
+    this.tileInfo = tile(48, vec2(gridSize), this.animations.walk.textureIndex, 0);
 
     this.collideTiles = true;
     this.collideRaycast = false;
   }
 
-  initStateMachine() {
-    return stateMachine<FsmData, Action, ExtraStateMethods>(
-      {
-        idle: {
-          input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
-          },
-          update({ player: p, update }, action) {
-            update();
-            if (p.rope?.hasHit) return "rope";
-            if (action == Action.ShootRope) p.shootRope();
-            if (action == Action.ReleaseRope) p.releaseRope();
-            if (action == Action.Jump) return "jump";
-            if (!p.groundObject) return "falling";
-
-            p.velocity = vec2(0);
-            p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
-
-            p.mirror = action == Action.Left;
-            if (action == Action.Left) return "walk";
-            if (action == Action.Right) return "walk";
-          },
-        },
-
-        walk: {
-          input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
-          },
-          update({ player: p, update }, action: Action) {
-            update();
-            if (p.rope?.hasHit) return "rope";
-            if (action == Action.ShootRope) p.shootRope();
-            if (action == Action.ReleaseRope) p.releaseRope();
-            if (action == Action.None) return "idle";
-            if (action == Action.Jump) return "jump";
-            if (!p.groundObject) return "falling";
-
-            p.velocity.x =
-              match(
-                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
-                action,
-              ) * p.SPEED;
-            p.animationTimer += e.timeDelta;
-
-            if (p.animationTimer >= p.animationSpeed) {
-              p.animationTimer = 0;
-              p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
-            }
-            p.tileInfo = tile(
-              p.animationFrame,
-              vec2(gridSize),
-              p.textureIndex,
-              1,
-            );
-          },
-        },
-
-        jump: {
-          input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
-          },
-          enter({ player: p }, action) {
-            p.applyAcceleration(vec2(0, 0.3));
-          },
-          update(data, action: Action) {
-            return "falling";
-          },
-        },
-        falling: {
-          input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
-          },
-          update({ player: p, update }, action: Action) {
-            update();
-            if (p.rope?.hasHit) return "rope";
-            if (action == Action.ShootRope) p.shootRope();
-            if (action == Action.ReleaseRope) p.releaseRope();
-            if (p.groundObject) return "idle";
-
-            p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
-
-            const factor = match(
-              { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
-              action,
-            );
-            p.applyForce(
-              vec2(
-                factor *
-                  remap({
-                    vin: { min: 0, max: factor },
-                    vout: { min: p.AIR_CONTROL, max: 0 },
-                    v: p.velocity.x / p.AIR_CONTROL,
-                  }),
-                0,
-              ),
-            );
-          },
-        },
-        rope: {
-          input(input): Action {
-            return match(
-              {
-                ...DEFAULT_KEYMAP,
-                ArrowUp: Action.ShortenRope,
-                ArrowDown: Action.LengthenRope,
-                Space: Action.ReleaseRope,
-                LeftMouse: Action.ReleaseRope,
-              },
-              input,
-            );
-          },
-          enter({ player: p }, action) {
-            p.snapPositionToRope();
-
-            const ropeVector = p.pos.subtract(p.rope!.anchor!);
-            p.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
-
-            const tangent = ropeVector.normalize().rotate(-90);
-            p.velocity = p.velocity.normalize().scale(p.velocity.dot(tangent));
-          },
-          update({ player: p }, action: Action) {
-            if (action == Action.ReleaseRope) return "falling";
-
-            if (action == Action.ShortenRope) p.rope!.length -= 0.1;
-            if (action == Action.LengthenRope) p.rope!.length += 0.1;
-            if (action == Action.ShortenRope || action == Action.LengthenRope)
-              p.snapPositionToRope();
-
-            const damping = 0.99;
-            const angularAcceleration =
-              -((-1 * e.gravity) / p.rope!.length) * Math.sin(p.ropeAngle);
-
-            p.ropeAngularVelocity += angularAcceleration;
-            p.ropeAngularVelocity *= damping;
-            p.ropeAngle += p.ropeAngularVelocity;
-
-            const swingForce = 0.001;
-            p.ropeAngularVelocity +=
-              match(
-                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
-                action,
-              ) * swingForce;
-
-            const newPos = vec2(
-              p.rope!.anchor!.x + p.rope!.length * Math.sin(p.ropeAngle),
-              p.rope!.anchor!.y - p.rope!.length * Math.cos(p.ropeAngle),
-            );
-
-            const oldPos = p.pos.copy();
-            p.pos = newPos;
-            const collision = e.tileCollisionRaycast(oldPos, p.pos);
-            if (collision) {
-              p.pos = oldPos;
-              p.ropeAngularVelocity *= -1;
-            }
-
-            p.velocity = p.pos.subtract(oldPos);
-          },
-          exit({ player }, action) {
-            player.releaseRope();
-          },
-        },
-      },
-      { player: this, update: () => super.update.call(this) },
-    );
-  }
-
   action(action: Action) {
     this.nextAction = action;
+  }
+
+  updateAnimation() {
+    this.animationTimer += e.timeDelta;
+    if (this.animationTimer >= this.currentAnimation.animationSpeed) {
+      this.animationTimer = 0;
+      this.animationFrame =
+        (this.animationFrame + 1) % this.currentAnimation.totalFrames;
+    }
+    this.tileInfo = tile(
+      this.currentAnimation.startFrame + this.animationFrame,
+      vec2(gridSize),
+      this.currentAnimation.textureIndex,
+      0,
+    );
   }
 
   update(): void {
@@ -274,6 +307,9 @@ export class Player extends e.EngineObject {
     if (this.rope?.hasMissed) this.releaseRope();
     this.updateLastPos();
     this.updateMirror();
+    if (this.idleTimer >= this.idleDelay || this.stateMachine.currentState !== this._states.idle) {
+      this.updateAnimation();
+    }
   }
 
   snapPositionToRope(): void {

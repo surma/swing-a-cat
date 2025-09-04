@@ -82,7 +82,10 @@ export function getEntitiesFromLayer(layer: LayerInstance, entityName: string) {
   return entity;
 }
 
-export function ldtkLevel(name: string) {
+export function ldtkLevel(
+  name: string,
+  entityMap: Record<string, { new (...a: any[]): any }>,
+) {
   const level = getLevel(name);
   const numTiles = vec2(level.pxWid, level.pxHei).divide(vec2(gridSize));
   const structureLayerDef = getLayerDefinition("Structure");
@@ -115,12 +118,8 @@ export function ldtkLevel(name: string) {
   const entities = entitiesLayer.entityInstances.flatMap((entity) => {
     if (!entity.__tile) return [];
     const textureIndex = getTilesetTextureIndexByUid(entity.__tile.tilesetUid);
-    const obj = new e.EngineObject(fromGridToWorld(entity.__grid), vec2(1));
-    obj.mass = 0;
-    obj.collideSolidObjects = false;
-    obj.collideTiles = false;
-    obj.collideRaycast = false;
-    obj.color = e.GREEN;
+    const c = entityMap[entity.__identifier] ?? e.EngineObject;
+    const obj: e.EngineObject = new c(fromGridToWorld(entity.__grid), vec2(1));
     obj.tileInfo = new e.TileInfo(
       vec2(entity.__tile.x, entity.__tile.y),
       vec2(gridSize),

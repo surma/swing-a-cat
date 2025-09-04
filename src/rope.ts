@@ -2,6 +2,7 @@ import * as e from "littlejsengine";
 import { vec2 } from "littlejsengine";
 import { Player } from "./player";
 import { clamp } from "./utils/helpers";
+import { meow } from "./sounds";
 
 export class Rope extends e.EngineObject {
   static SHOOT_SPEED = 1;
@@ -20,6 +21,7 @@ export class Rope extends e.EngineObject {
     this.anchor = e.tileCollisionRaycast(start.pos, this.end);
     if (this.anchor) this.end = this.anchor;
     this.shootDuration = this.end.distance(start.pos) * Rope.SHOOT_SPEED;
+    meow.play();
   }
 
   get willHit(): boolean {

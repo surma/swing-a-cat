@@ -8,10 +8,9 @@ import stateMachine, {
   StateMachineInstance,
 } from "./state-machine";
 import { Action, DEFAULT_KEYMAP, Player } from "./player";
+import * as entities from "./entities";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
-
-let p: Player;
 
 function gameInit() {
   e.setCameraScale(gridSize * 3);
@@ -26,13 +25,13 @@ function gameInit() {
   // (inside ldtkLevel()), and I don't wanna grab the data manually lol.
   e.initTileCollision(vec2(90, 90));
 
-  const { layer, spawnPos } = ldtkLevel("Level_1");
+  const { layer, spawnPos, entities: ent } = ldtkLevel("Level_1", entities);
   layer.collideRaycast = true;
   layer.collideSolidObjects = true;
   layer.collideTiles = true;
   layer.redraw();
 
-  p = new Player(spawnPos);
+  Player.SINGLETON = new Player(spawnPos);
   e.setCameraPos(spawnPos);
 }
 
@@ -42,11 +41,12 @@ function gameUpdate() {
 
 function updateCamera() {
   const CAMERA_LAG = 0.1;
-  const toPlayerVec = p.pos.subtract(e.cameraPos);
+  const toPlayerVec = Player.SINGLETON.pos.subtract(e.cameraPos);
   e.setCameraPos(e.cameraPos.add(toPlayerVec.scale(CAMERA_LAG)));
 }
 
 function gameUpdatePost() {
+  const p = Player.SINGLETON;
   const KEYS = [...Object.keys(DEFAULT_KEYMAP), "ArrowUp", "ArrowDown"];
   for (const key of KEYS) {
     if (e.keyIsDown(key)) {

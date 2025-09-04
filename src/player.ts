@@ -38,6 +38,7 @@ export const DEFAULT_KEYMAP = {
   default: Action.None,
 };
 export class Player extends e.EngineObject {
+  static SINGLETON: Player;
   rope: Rope | null = null;
   textureIndex = getTilesetTextureIndexByIdent("Cat");
   SPEED: number = 0.12;
@@ -53,6 +54,8 @@ export class Player extends e.EngineObject {
   ropeAngle: number = 0;
   ropeAngularVelocity: number = 0;
   ropeLength: number = 0;
+
+  maxRopeLength = 3;
 
   stateMachine: StateMachineInstance<FsmData, Action, ExtraStateMethods> =
     this.initStateMachine();
@@ -79,7 +82,11 @@ export class Player extends e.EngineObject {
 
   shootRope() {
     if (this.isRopeActive) return;
-    this.rope = new Rope(this, e.mousePos.subtract(this.pos), 10);
+    this.rope = new Rope(
+      this,
+      e.mousePos.subtract(this.pos),
+      this.maxRopeLength,
+    );
   }
 
   constructor(pos: e.Vector2) {
@@ -179,6 +186,7 @@ export class Player extends e.EngineObject {
             return match(DEFAULT_KEYMAP, input);
           },
           enter({ player: p }, action) {
+            leap.play();
             p.applyAcceleration(vec2(0, 0.3));
           },
           update(data, action: Action) {

@@ -1,10 +1,6 @@
 import * as e from "littlejsengine";
 import { vec2, PI, tile, hsl } from "littlejsengine";
-import {
-  ldtkLevel,
-  gridSize,
-  textures,
-} from "./utils/ldtk";
+import { ldtkLevel, gridSize, textures } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import "./music";
 import stateMachine, {

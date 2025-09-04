@@ -24,3 +24,15 @@ export function pick<T, K extends Array<keyof T>>(obj: T, ...keys: K): T {
     Object.entries(obj).filter(([k, v]) => keyset.has(k)),
   );
 }
+
+export function remap(opts) {
+  const { vin, vout, v } = opts;
+  let p = (v - vin.min) / (vin.max - vin.min);
+  if (opts.clamp ?? true) {
+    p = clamp({ v: p, min: 0, max: 1 });
+  }
+  if (Number.isNaN(p)) {
+    p = 0;
+  }
+  return (vout.max - vout.min) * p + vout.min;
+}

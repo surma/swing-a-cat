@@ -4,8 +4,8 @@ import { getTilesetTextureIndexByIdent, gridSize } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
-import { match } from "./utils/helpers";
 import { leap, meow, clover } from "./sounds";
+import { clamp, match, remap } from "./utils/helpers";
 
 export enum Action {
   None,
@@ -42,7 +42,7 @@ export class Player extends e.EngineObject {
   rope: Rope | null = null;
   textureIndex = getTilesetTextureIndexByIdent("Cat");
   SPEED: number = 0.12;
-  AIR_CONTROL: number = 0.005;
+  AIR_CONTROL: number = 0.15;
   lastPos: [e.Vector2, e.Vector2];
   animationFrame: number = 0;
   animationTimer: number = 0;
@@ -80,7 +80,6 @@ export class Player extends e.EngineObject {
 
   shootRope() {
     if (this.rope) return;
-    meow.play();
     this.rope = new Rope(this, e.mousePos.subtract(this.pos), 10);
   }
 
@@ -160,7 +159,6 @@ export class Player extends e.EngineObject {
             return match(DEFAULT_KEYMAP, input);
           },
           enter({ player: p }, action) {
-            leap.play();
             p.applyAcceleration(vec2(0, 0.3));
           },
           update(data, action: Action) {
@@ -180,11 +178,21 @@ export class Player extends e.EngineObject {
 
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
 
-            p.velocity.x +=
-              match(
-                { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
-                action,
-              ) * p.AIR_CONTROL;
+            const factor = match(
+              { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
+              action,
+            );
+            p.applyForce(
+              vec2(
+                factor *
+                  remap({
+                    vin: { min: 0, max: factor },
+                    vout: { min: p.AIR_CONTROL, max: 0 },
+                    v: p.velocity.x / p.AIR_CONTROL,
+                  }),
+                0,
+              ),
+            );
           },
         },
         rope: {

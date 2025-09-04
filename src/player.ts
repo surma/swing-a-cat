@@ -14,8 +14,7 @@ export enum Action {
   Up,
   Down,
   Jump,
-  ShootRope,
-  ReleaseRope,
+  Rope,
   ShortenRope,
   LengthenRope,
 }
@@ -33,9 +32,9 @@ export const DEFAULT_KEYMAP = {
   ArrowRight: Action.Right,
   ArrowLeft: Action.Left,
   Space: Action.Jump,
-  KeyE: Action.ShootRope,
-  LeftMouse: Action.ShootRope,
-  RightMouse: Action.ReleaseRope,
+  KeyE: Action.Rope,
+  KeyK: Action.Rope,
+  LeftMouse: Action.Rope,
   default: Action.None,
 };
 export class Player extends e.EngineObject {
@@ -79,7 +78,7 @@ export class Player extends e.EngineObject {
   }
 
   shootRope() {
-    if (this.rope) return;
+    if (this.isRopeActive) return;
     this.rope = new Rope(this, e.mousePos.subtract(this.pos), 10);
   }
 
@@ -97,6 +96,14 @@ export class Player extends e.EngineObject {
     this.collideRaycast = false;
   }
 
+  get isRopeActive() {
+    return this.rope && this.rope.hasHit;
+  }
+
+  get canShootRope() {
+    return !this.rope;
+  }
+
   initStateMachine() {
     return stateMachine<FsmData, Action, ExtraStateMethods>(
       {
@@ -107,8 +114,8 @@ export class Player extends e.EngineObject {
           update({ player: p, update }, action) {
             update();
             if (p.rope?.hasHit) return "rope";
-            if (action == Action.ShootRope) p.shootRope();
-            if (action == Action.ReleaseRope) p.releaseRope();
+            if (action == Action.Rope && p.canShootRope) p.shootRope();
+            else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
             if (action == Action.Jump) return "jump";
             if (!p.groundObject) return "falling";
 
@@ -128,8 +135,8 @@ export class Player extends e.EngineObject {
           update({ player: p, update }, action: Action) {
             update();
             if (p.rope?.hasHit) return "rope";
-            if (action == Action.ShootRope) p.shootRope();
-            if (action == Action.ReleaseRope) p.releaseRope();
+            if (action == Action.Rope && p.canShootRope) p.shootRope();
+            else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
             if (action == Action.None) return "idle";
             if (action == Action.Jump) return "jump";
             if (!p.groundObject) return "falling";
@@ -172,8 +179,8 @@ export class Player extends e.EngineObject {
           update({ player: p, update }, action: Action) {
             update();
             if (p.rope?.hasHit) return "rope";
-            if (action == Action.ShootRope) p.shootRope();
-            if (action == Action.ReleaseRope) p.releaseRope();
+            if (action == Action.Rope && p.canShootRope) p.shootRope();
+            else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
             if (p.groundObject) return "idle";
 
             p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
@@ -202,8 +209,7 @@ export class Player extends e.EngineObject {
                 ...DEFAULT_KEYMAP,
                 ArrowUp: Action.ShortenRope,
                 ArrowDown: Action.LengthenRope,
-                Space: Action.ReleaseRope,
-                LeftMouse: Action.ReleaseRope,
+                Space: Action.Rope,
               },
               input,
             );
@@ -218,7 +224,7 @@ export class Player extends e.EngineObject {
             p.velocity = p.velocity.normalize().scale(p.velocity.dot(tangent));
           },
           update({ player: p }, action: Action) {
-            if (action == Action.ReleaseRope) return "falling";
+            if (action == Action.Rope) return "falling";
 
             if (action == Action.ShortenRope) p.rope!.length -= 0.1;
             if (action == Action.LengthenRope) p.rope!.length += 0.1;

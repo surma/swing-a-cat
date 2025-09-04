@@ -104,6 +104,19 @@ export class Player extends e.EngineObject {
     return !this.rope;
   }
 
+  changeRope(delta: number) {
+    if (!this.isRopeActive) return;
+
+    const dir = this.rope!.direction!.normalize();
+    let nextPos = this.pos.add(dir.scale(delta));
+    while (e.tileCollisionTest(nextPos, vec2(1.5))) {
+      nextPos = nextPos.subtract(dir.scale(0.1));
+    }
+
+    this.rope!.length = this.rope!.anchor!.distance(nextPos);
+    this.snapPositionToRope();
+  }
+
   initStateMachine() {
     return stateMachine<FsmData, Action, ExtraStateMethods>(
       {
@@ -215,7 +228,9 @@ export class Player extends e.EngineObject {
             );
           },
           enter({ player: p }, action) {
-            p.snapPositionToRope();
+            // Changing the length rope by 0 triggeres
+            // the code that makes sure we are not colliding
+            p.changeRope(0);
 
             const ropeVector = p.pos.subtract(p.rope!.anchor!);
             p.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
@@ -226,10 +241,8 @@ export class Player extends e.EngineObject {
           update({ player: p }, action: Action) {
             if (action == Action.Rope) return "falling";
 
-            if (action == Action.ShortenRope) p.rope!.length -= 0.1;
-            if (action == Action.LengthenRope) p.rope!.length += 0.1;
-            if (action == Action.ShortenRope || action == Action.LengthenRope)
-              p.snapPositionToRope();
+            if (action == Action.ShortenRope) p.changeRope(-0.1);
+            if (action == Action.LengthenRope) p.changeRope(0.1);
 
             const damping = 0.99;
             const angularAcceleration =

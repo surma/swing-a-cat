@@ -30,7 +30,7 @@ export class BaseClover extends e.EngineObject {
 
 export class Clover3 extends BaseClover {
   onHit() {
-    Player.SINGLETON.maxRopeLength += 10;
+    Player.SINGLETON.maxRopeLength += 2;
     clover.play();
     this.destroy();
   }

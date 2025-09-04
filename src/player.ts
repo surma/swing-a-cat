@@ -55,7 +55,7 @@ export class Player extends e.EngineObject {
   ropeAngularVelocity: number = 0;
   ropeLength: number = 0;
 
-  maxRopeLength = 3;
+  maxRopeLength = 4;
 
   stateMachine: StateMachineInstance<FsmData, Action, ExtraStateMethods> =
     this.initStateMachine();

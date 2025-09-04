@@ -16,7 +16,7 @@ function gameInit() {
   e.setCameraScale(gridSize * 3);
   // e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
-  e.setGravity(-0.01);
+  e.setGravity(-0.015);
   e.setInputWASDEmulateDirection(true);
 
   document.body.style.background = "#4b6a8bcb";

@@ -3583,7 +3583,7 @@ function inputUpdate() {
   mousePos = screenToWorld(mousePosScreen);
 
   // update gamepads if enabled
-  gamepadsUpdate();
+  // gamepadsUpdate();
 }
 
 function inputUpdatePost() {
@@ -5944,39 +5944,39 @@ function glSetAntialias(antialias = true) {
  *  @param {Number} [rgbaAdditive=0]
  *  @memberof WebGL */
 function glDraw(
-  x,
-  y,
-  sizeX,
-  sizeY,
-  angle,
-  uv0X,
-  uv0Y,
-  uv1X,
-  uv1Y,
-  rgba,
-  rgbaAdditive = 0,
+  // x,
+  // y,
+  // sizeX,
+  // sizeY,
+  // angle,
+  // uv0X,
+  // uv0Y,
+  // uv1X,
+  // uv1Y,
+  // rgba,
+  // rgbaAdditive = 0,
 ) {
-  ASSERT(
-    typeof rgba == "number" && typeof rgbaAdditive == "number",
-    "invalid color",
-  );
+  // ASSERT(
+  //   typeof rgba == "number" && typeof rgbaAdditive == "number",
+  //   "invalid color",
+  // );
 
-  // flush if there is not enough room or if different blend mode
-  if (glInstanceCount >= gl_MAX_INSTANCES || glBatchAdditive != glAdditive)
-    glFlush();
+  // // flush if there is not enough room or if different blend mode
+  // if (glInstanceCount >= gl_MAX_INSTANCES || glBatchAdditive != glAdditive)
+  //   glFlush();
 
-  let offset = glInstanceCount++ * gl_INDICES_PER_INSTANCE;
-  glPositionData[offset++] = x;
-  glPositionData[offset++] = y;
-  glPositionData[offset++] = sizeX;
-  glPositionData[offset++] = sizeY;
-  glPositionData[offset++] = uv0X;
-  glPositionData[offset++] = uv0Y;
-  glPositionData[offset++] = uv1X;
-  glPositionData[offset++] = uv1Y;
-  glColorData[offset++] = rgba;
-  glColorData[offset++] = rgbaAdditive;
-  glPositionData[offset++] = angle;
+  // let offset = glInstanceCount++ * gl_INDICES_PER_INSTANCE;
+  // glPositionData[offset++] = x;
+  // glPositionData[offset++] = y;
+  // glPositionData[offset++] = sizeX;
+  // glPositionData[offset++] = sizeY;
+  // glPositionData[offset++] = uv0X;
+  // glPositionData[offset++] = uv0Y;
+  // glPositionData[offset++] = uv1X;
+  // glPositionData[offset++] = uv1Y;
+  // glColorData[offset++] = rgba;
+  // glColorData[offset++] = rgbaAdditive;
+  // glPositionData[offset++] = angle;
 }
 /**
  * LittleJS - The Tiny Fast JavaScript Game Engine
@@ -6119,7 +6119,7 @@ function engineInit(
 
     // disable smoothing for pixel art
     overlayContext.imageSmoothingEnabled = mainContext.imageSmoothingEnabled =
-      !tilesPixelated;
+     !tilesPixelated;
 
     // setup gl rendering if enabled
     glPreRender();
@@ -6130,27 +6130,27 @@ function engineInit(
     // update time keeping
     let frameTimeDeltaMS = frameTimeMS - frameTimeLastMS;
     frameTimeLastMS = frameTimeMS;
-    if (debug || showWatermark)
-      averageFPS = lerp(0.05, averageFPS, 1e3 / (frameTimeDeltaMS || 1));
-    const debugSpeedUp = debug && keyIsDown("Equal"); // +
-    const debugSpeedDown = debug && keyIsDown("Minus"); // -
-    if (debug)
-      // +/- to speed/slow time
-      frameTimeDeltaMS *= debugSpeedUp ? 5 : debugSpeedDown ? 0.2 : 1;
+    // if (debug || showWatermark)
+    //   averageFPS = lerp(0.05, averageFPS, 1e3 / (frameTimeDeltaMS || 1));
+    // const debugSpeedUp = debug && keyIsDown("Equal"); // +
+    // const debugSpeedDown = debug && keyIsDown("Minus"); // -
+    // if (debug)
+    //   // +/- to speed/slow time
+    //   frameTimeDeltaMS *= debugSpeedUp ? 5 : debugSpeedDown ? 0.2 : 1;
     timeReal += frameTimeDeltaMS / 1e3;
     frameTimeBufferMS += paused ? 0 : frameTimeDeltaMS;
-    if (!debugSpeedUp) frameTimeBufferMS = min(frameTimeBufferMS, 50); // clamp in case of slow framerate
+    // if (!debugSpeedUp) frameTimeBufferMS = min(frameTimeBufferMS, 50); // clamp in case of slow framerate
 
     updateCanvas();
 
     if (paused) {
       // update object transforms even when paused
-      for (const o of engineObjects) o.parent || o.updateTransforms();
-      inputUpdate();
-      pluginUpdateList.forEach((f) => f());
-      debugUpdate();
-      gameUpdatePost();
-      inputUpdatePost();
+      // for (const o of engineObjects) o.parent || o.updateTransforms();
+      // inputUpdate();
+      // pluginUpdateList.forEach((f) => f());
+      // debugUpdate();
+      // gameUpdatePost();
+      // inputUpdatePost();
     } else {
       // apply time delta smoothing, improves smoothness of framerate in some browsers
       let deltaSmooth = 0;
@@ -6193,29 +6193,29 @@ function engineInit(
       debugRender();
       glCopyToContext(mainContext);
 
-      if (showWatermark) {
-        // update fps
-        overlayContext.textAlign = "right";
-        overlayContext.textBaseline = "top";
-        overlayContext.font = "1em monospace";
-        overlayContext.fillStyle = "#000";
-        const text =
-          engineName +
-          " " +
-          "v" +
-          engineVersion +
-          " / " +
-          drawCount +
-          " / " +
-          engineObjects.length +
-          " / " +
-          averageFPS.toFixed(1) +
-          (glEnable ? " GL" : " 2D");
-        overlayContext.fillText(text, mainCanvas.width - 3, 3);
-        overlayContext.fillStyle = "#fff";
-        overlayContext.fillText(text, mainCanvas.width - 2, 2);
-        drawCount = 0;
-      }
+      // if (showWatermark) {
+      //   // update fps
+      //   overlayContext.textAlign = "right";
+      //   overlayContext.textBaseline = "top";
+      //   overlayContext.font = "1em monospace";
+      //   overlayContext.fillStyle = "#000";
+      //   const text =
+      //     engineName +
+      //     " " +
+      //     "v" +
+      //     engineVersion +
+      //     " / " +
+      //     drawCount +
+      //     " / " +
+      //     engineObjects.length +
+      //     " / " +
+      //     averageFPS.toFixed(1) +
+      //     (glEnable ? " GL" : " 2D");
+      //   overlayContext.fillText(text, mainCanvas.width - 3, 3);
+      //   overlayContext.fillStyle = "#fff";
+      //   overlayContext.fillText(text, mainCanvas.width - 2, 2);
+      //   drawCount = 0;
+      // }
     }
 
     requestAnimationFrame(engineUpdate);
@@ -6224,27 +6224,27 @@ function engineInit(
   function updateCanvas() {
     if (headlessMode) return;
 
-    if (canvasFixedSize.x) {
-      // clear canvas and set fixed size
-      mainCanvas.width = canvasFixedSize.x;
-      mainCanvas.height = canvasFixedSize.y;
+    // if (canvasFixedSize.x) {
+    //   // clear canvas and set fixed size
+    //   mainCanvas.width = canvasFixedSize.x;
+    //   mainCanvas.height = canvasFixedSize.y;
 
-      // fit to window by adding space on top or bottom if necessary
-      const aspect = innerWidth / innerHeight;
-      const fixedAspect = mainCanvas.width / mainCanvas.height;
-      (glCanvas || mainCanvas).style.width =
-        mainCanvas.style.width =
-        overlayCanvas.style.width =
-          aspect < fixedAspect ? "100%" : "";
-      (glCanvas || mainCanvas).style.height =
-        mainCanvas.style.height =
-        overlayCanvas.style.height =
-          aspect < fixedAspect ? "" : "100%";
-    } else {
+    //   // fit to window by adding space on top or bottom if necessary
+    //   const aspect = innerWidth / innerHeight;
+    //   const fixedAspect = mainCanvas.width / mainCanvas.height;
+    //   (glCanvas || mainCanvas).style.width =
+    //     mainCanvas.style.width =
+    //     overlayCanvas.style.width =
+    //       aspect < fixedAspect ? "100%" : "";
+    //   (glCanvas || mainCanvas).style.height =
+    //     mainCanvas.style.height =
+    //     overlayCanvas.style.height =
+    //       aspect < fixedAspect ? "" : "100%";
+    // } else {
       // clear canvas and set size to same as window
       mainCanvas.width = min(innerWidth, canvasMaxSize.x);
       mainCanvas.height = min(innerHeight, canvasMaxSize.y);
-    }
+    // }
 
     // clear overlay canvas and set size
     overlayCanvas.width = mainCanvas.width;
@@ -6254,8 +6254,9 @@ function engineInit(
     mainCanvasSize = vec2(mainCanvas.width, mainCanvas.height);
   }
 
-  function startEngine() {
-    new Promise((resolve) => resolve(gameInit())).then(engineUpdate);
+  async function startEngine() {
+    await gameInit();
+    await engineUpdate();
   }
 
   if (headlessMode) {
@@ -6264,20 +6265,20 @@ function engineInit(
   }
 
   // setup html
-  const styleRoot =
-    "margin:0;overflow:hidden;" + // fill the window
-    "width:100vw;height:100vh;" + // fill the window
-    "display:flex;" + // use flexbox
-    "align-items:center;" + // horizontal center
-    "justify-content:center;" + // vertical center
-    "background:#000;" + // set background color
-    (canvasPixelated ? "image-rendering:pixelated;" : "") + // pixel art
-    "user-select:none;" + // prevent hold to select
-    "-webkit-user-select:none;" + // compatibility for ios
-    (!touchInputEnable
-      ? "" // no touch css settings
-      : "touch-action:none;" + // prevent mobile pinch to resize
-        "-webkit-touch-callout:none"); // compatibility for ios
+  const styleRoot = "";
+    // "margin:0;overflow:hidden;" + // fill the window
+    // "width:100vw;height:100vh;" + // fill the window
+    // "display:flex;" + // use flexbox
+    // "align-items:center;" + // horizontal center
+    // "justify-content:center;" + // vertical center
+    // "background:#000;" + // set background color
+    // (canvasPixelated ? "image-rendering:pixelated;" : "") + // pixel art
+    // "user-select:none;" + // prevent hold to select
+    // "-webkit-user-select:none;" + // compatibility for ios
+    // (!touchInputEnable
+    //   ? "" // no touch css settings
+    //   : "touch-action:none;" + // prevent mobile pinch to resize
+    //     "-webkit-touch-callout:none"); // compatibility for ios
   rootElement.style.cssText = styleRoot;
   rootElement.appendChild((mainCanvas = document.createElement("canvas")));
   mainContext = mainCanvas.getContext("2d");
@@ -6856,7 +6857,7 @@ export {
   gamepadWasPressed,
   gamepadWasReleased,
   gamepadStick,
-  gamepadsUpdate,
+  // gamepadsUpdate,
   vibrate,
   vibrateStop,
   isTouchDevice,

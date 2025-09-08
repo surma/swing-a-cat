@@ -19,7 +19,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "littlejsengine": "^1.11.8",
+    "google-closure-compiler": "^20250903.0.0",
     "terser": "^5.42.0",
     "vite": "^6.3.5"
   }

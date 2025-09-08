@@ -1,5 +1,6 @@
 import { defineConfig, PluginOption } from "vite";
 import { ldtkLoaderPlugin } from "./ldtk/plugin";
+import closurePlugin from "./closure.plugin";
 
 export default defineConfig({
   build: {
@@ -7,10 +8,12 @@ export default defineConfig({
     target: "esnext",
     sourcemap: true,
   },
-  plugins: [
-    ldtkLoaderPlugin(),
-    // 234
-  ],
+  plugins: [ldtkLoaderPlugin(), closurePlugin()],
+  resolve: {
+    alias: {
+      littlejsengine: new URL("./littlejs.esm.js", import.meta.url).pathname,
+    },
+  },
   test: {
     browser: {
       enabled: true,

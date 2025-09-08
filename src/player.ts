@@ -40,7 +40,7 @@ export const DEFAULT_KEYMAP = {
 export class Player extends e.EngineObject {
   static SINGLETON: Player;
   rope: Rope | null = null;
-  textureIndex = getTilesetTextureIndexByIdent("Cat");
+  textureIndex = getTilesetTextureIndexByIdent("All_images");
   SPEED: number = 0.12;
   AIR_CONTROL: number = 0.15;
   lastPos: [e.Vector2, e.Vector2];
@@ -96,7 +96,7 @@ export class Player extends e.EngineObject {
     this.size = vec2(1, 1);
 
     // Get Cat tileset texture index and create tile reference
-    const catTextureIndex = getTilesetTextureIndexByIdent("Cat");
+    const catTextureIndex = getTilesetTextureIndexByIdent("All_images");
     this.tileInfo = tile(0, vec2(gridSize), catTextureIndex, 1);
 
     this.collideTiles = true;
@@ -140,7 +140,7 @@ export class Player extends e.EngineObject {
             if (!p.groundObject) return "falling";
 
             p.velocity = vec2(0);
-            p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
+            p.tileInfo = tile(24, vec2(gridSize), p.textureIndex, 0);
 
             p.mirror = action == Action.Left;
             if (action == Action.Left) return "walk";
@@ -173,10 +173,10 @@ export class Player extends e.EngineObject {
               p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
             }
             p.tileInfo = tile(
-              p.animationFrame,
+              40 + p.animationFrame,
               vec2(gridSize),
               p.textureIndex,
-              1,
+              0,
             );
           },
         },
@@ -204,7 +204,7 @@ export class Player extends e.EngineObject {
             else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
             if (p.groundObject) return "idle";
 
-            p.tileInfo = tile(0, vec2(gridSize), p.textureIndex, 1);
+            p.tileInfo = tile(24, vec2(gridSize), p.textureIndex, 0);
 
             const factor = match(
               { [Action.Left]: -1, [Action.Right]: 1, default: 0 },

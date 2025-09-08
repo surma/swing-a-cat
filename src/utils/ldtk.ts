@@ -131,9 +131,17 @@ export function ldtkLevel(
   const spawnPos = fromGridToWorld(spawn.__grid);
 
   // Process auto-layer tiles if they exist
-  if (!(structureLayer.autoLayerTiles?.length > 0))
-    throw Error("Structure layer does not have auto tiles");
-  for (const autoTile of structureLayer.autoLayerTiles) {
+  for (const idx of structureLayer.autoLayerTiles.px_x.keys()) {
+    const autoTile = {
+      px: [
+        structureLayer.autoLayerTiles.px_x[idx],
+        structureLayer.autoLayerTiles.px_y[idx],
+      ],
+      src: [
+        structureLayer.autoLayerTiles.src_x[idx],
+        structureLayer.autoLayerTiles.src_y[idx],
+      ],
+    };
     const tilePos = vec2(...autoTile.px)
       .scale(1 / gridSize)
       .floor();

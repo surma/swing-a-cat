@@ -274,7 +274,7 @@ export class Player extends e.EngineObject {
 
             const oldPos = p.pos.copy();
             p.pos = newPos;
-            const collision = e.tileCollisionRaycast(oldPos, p.pos);
+            const collision = e.tileCollisionTest(p.pos, vec2(1.5));
             if (collision) {
               p.pos = oldPos;
               p.ropeAngularVelocity *= -1;

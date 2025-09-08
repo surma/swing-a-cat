@@ -5943,7 +5943,7 @@ function glSetAntialias(antialias = true) {
  *  @param {Number} rgba
  *  @param {Number} [rgbaAdditive=0]
  *  @memberof WebGL */
-function glDraw(
+function glDraw() {
   // x,
   // y,
   // sizeX,
@@ -5955,16 +5955,13 @@ function glDraw(
   // uv1Y,
   // rgba,
   // rgbaAdditive = 0,
-) {
   // ASSERT(
   //   typeof rgba == "number" && typeof rgbaAdditive == "number",
   //   "invalid color",
   // );
-
   // // flush if there is not enough room or if different blend mode
   // if (glInstanceCount >= gl_MAX_INSTANCES || glBatchAdditive != glAdditive)
   //   glFlush();
-
   // let offset = glInstanceCount++ * gl_INDICES_PER_INSTANCE;
   // glPositionData[offset++] = x;
   // glPositionData[offset++] = y;
@@ -6093,7 +6090,7 @@ function engineAddPlugin(updateFunction, renderFunction) {
  *  @param {Array} [imageSources=[]] - List of images to load
  *  @param {HTMLElement} [rootElement] - Root element to attach to, the document body by default
  *  @memberof Engine */
-function engineInit(
+async function engineInit(
   gameInit,
   gameUpdate,
   gameUpdatePost,
@@ -6119,7 +6116,7 @@ function engineInit(
 
     // disable smoothing for pixel art
     overlayContext.imageSmoothingEnabled = mainContext.imageSmoothingEnabled =
-     !tilesPixelated;
+      !tilesPixelated;
 
     // setup gl rendering if enabled
     glPreRender();
@@ -6186,12 +6183,12 @@ function engineInit(
       enginePreRender();
       gameRender();
       engineObjects.sort((a, b) => a.renderOrder - b.renderOrder);
-      for (const o of engineObjects) o.destroyed || o.render();
+      engineObjects.forEach((o) => o.render());
       gameRenderPost();
-      pluginRenderList.forEach((f) => f());
-      touchGamepadRender();
-      debugRender();
-      glCopyToContext(mainContext);
+      // pluginRenderList.forEach((f) => f());
+      // touchGamepadRender();
+      // debugRender();
+      // glCopyToContext(mainContext);
 
       // if (showWatermark) {
       //   // update fps
@@ -6241,9 +6238,9 @@ function engineInit(
     //     overlayCanvas.style.height =
     //       aspect < fixedAspect ? "" : "100%";
     // } else {
-      // clear canvas and set size to same as window
-      mainCanvas.width = min(innerWidth, canvasMaxSize.x);
-      mainCanvas.height = min(innerHeight, canvasMaxSize.y);
+    // clear canvas and set size to same as window
+    mainCanvas.width = min(innerWidth, canvasMaxSize.x);
+    mainCanvas.height = min(innerHeight, canvasMaxSize.y);
     // }
 
     // clear overlay canvas and set size
@@ -6266,19 +6263,19 @@ function engineInit(
 
   // setup html
   const styleRoot = "";
-    // "margin:0;overflow:hidden;" + // fill the window
-    // "width:100vw;height:100vh;" + // fill the window
-    // "display:flex;" + // use flexbox
-    // "align-items:center;" + // horizontal center
-    // "justify-content:center;" + // vertical center
-    // "background:#000;" + // set background color
-    // (canvasPixelated ? "image-rendering:pixelated;" : "") + // pixel art
-    // "user-select:none;" + // prevent hold to select
-    // "-webkit-user-select:none;" + // compatibility for ios
-    // (!touchInputEnable
-    //   ? "" // no touch css settings
-    //   : "touch-action:none;" + // prevent mobile pinch to resize
-    //     "-webkit-touch-callout:none"); // compatibility for ios
+  // "margin:0;overflow:hidden;" + // fill the window
+  // "width:100vw;height:100vh;" + // fill the window
+  // "display:flex;" + // use flexbox
+  // "align-items:center;" + // horizontal center
+  // "justify-content:center;" + // vertical center
+  // "background:#000;" + // set background color
+  // (canvasPixelated ? "image-rendering:pixelated;" : "") + // pixel art
+  // "user-select:none;" + // prevent hold to select
+  // "-webkit-user-select:none;" + // compatibility for ios
+  // (!touchInputEnable
+  //   ? "" // no touch css settings
+  //   : "touch-action:none;" + // prevent mobile pinch to resize
+  //     "-webkit-touch-callout:none"); // compatibility for ios
   rootElement.style.cssText = styleRoot;
   rootElement.appendChild((mainCanvas = document.createElement("canvas")));
   mainContext = mainCanvas.getContext("2d");
@@ -6286,8 +6283,8 @@ function engineInit(
   // init stuff and start engine
   inputInit();
   audioInit();
-  debugInit();
-  glInit();
+  // debugInit();
+  // glInit();
 
   // create overlay canvas for hud to appear above gl canvas
   rootElement.appendChild((overlayCanvas = document.createElement("canvas")));
@@ -6300,26 +6297,9 @@ function engineInit(
   updateCanvas();
 
   // create promises for loading images
-  const promises = imageSources.map(
-    (src, textureIndex) =>
-      new Promise((resolve) => {
-        const image = new Image();
-        image.crossOrigin = "anonymous";
-        image.onerror = image.onload = () => {
-          textureInfos[textureIndex] = new TextureInfo(image);
-          resolve();
-        };
-        image.src = src;
-      }),
-  );
-
-  if (!imageSources.length) {
-    // no images to load
-    promises.push(
-      new Promise((resolve) => {
-        textureInfos[0] = new TextureInfo(new Image());
-        resolve();
-      }),
+  for (const [textureIndex, src] of (imageSources ?? []).entries()) {
+    textureInfos[textureIndex] = new TextureInfo(
+      await createImageBitmap(await fetch(src).then((r) => r.blob())),
     );
   }
 
@@ -6339,8 +6319,7 @@ function engineInit(
     );
   }
 
-  // load all of the images
-  Promise.all(promises).then(startEngine);
+  return startEngine();
 }
 
 /** Update each engine object, remove destroyed objects, and update time

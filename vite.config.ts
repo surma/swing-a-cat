@@ -8,7 +8,7 @@ export default defineConfig({
     modulePreload: {
       polyfill: false,
     },
-    assetsInlineLimit: 0,
+    assetsInlineLimit: 1e9,
     minify: "terser",
     // minify: false,
     target: "esnext",

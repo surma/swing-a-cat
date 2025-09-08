@@ -16,14 +16,14 @@ function gameInit() {
   e.setCameraScale(gridSize * 3);
   // e.setCanvasFixedSize(vec2(384, 216));
   e.setCanvasPixelated(true);
-  e.setGravity(-0.015);
+  e.setGravity(-0.018);
   e.setInputWASDEmulateDirection(true);
 
   document.body.style.background = "#4b6a8bcb";
 
   // Hardcoding this because this call MUST happen before I create a TileLayer
   // (inside ldtkLevel()), and I don't wanna grab the data manually lol.
-  e.initTileCollision(vec2(90, 90));
+  e.initTileCollision(vec2(100, 70));
 
   const { layer, spawnPos, entities: ent } = ldtkLevel("Level_1", entities);
   layer.collideRaycast = true;

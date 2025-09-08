@@ -46,7 +46,7 @@ export class Clover4 extends BaseClover {
   render() {
     super.render();
     if (this.won) {
-      e.drawText("YOU WIN MOTHERFUCKER", Player.SINGLETON.pos);
+      e.drawText("YOU SURE SWUNG THAT CAT", Player.SINGLETON.pos);
     }
   }
 }

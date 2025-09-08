@@ -140,7 +140,7 @@ export class Player extends e.EngineObject {
             if (!p.groundObject) return "falling";
 
             p.velocity = vec2(0);
-            p.tileInfo = tile(24, vec2(gridSize), p.textureIndex, 0);
+            p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
 
             p.mirror = action == Action.Left;
             if (action == Action.Left) return "walk";
@@ -173,7 +173,7 @@ export class Player extends e.EngineObject {
               p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
             }
             p.tileInfo = tile(
-              40 + p.animationFrame,
+              15 + p.animationFrame,
               vec2(gridSize),
               p.textureIndex,
               0,
@@ -204,7 +204,7 @@ export class Player extends e.EngineObject {
             else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
             if (p.groundObject) return "idle";
 
-            p.tileInfo = tile(24, vec2(gridSize), p.textureIndex, 0);
+            p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
 
             const factor = match(
               { [Action.Left]: -1, [Action.Right]: 1, default: 0 },

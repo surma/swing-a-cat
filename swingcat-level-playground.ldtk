@@ -1095,44 +1095,6 @@
 		}
 	], "tilesets": [
 		{
-			"__cWid": 5,
-			"__cHei": 3,
-			"identifier": "Grass",
-			"uid": 114,
-			"relPath": "swing-tileset-comp.png",
-			"embedAtlas": null,
-			"pxWid": 40,
-			"pxHei": 24,
-			"tileGridSize": 8,
-			"spacing": 0,
-			"padding": 0,
-			"tags": [],
-			"tagsSourceEnumUid": null,
-			"enumTags": [],
-			"customData": [],
-			"savedSelections": [],
-			"cachedPixelData": { "opaqueTiles": "010000100000000", "averageColors": "e365f355e355f355f255f355f256f355f355f255e355f355e365e48e0000" }
-		},
-		{
-			"__cWid": 4,
-			"__cHei": 1,
-			"identifier": "Cat",
-			"uid": 129,
-			"relPath": "cat_run.png",
-			"embedAtlas": null,
-			"pxWid": 40,
-			"pxHei": 10,
-			"tileGridSize": 8,
-			"spacing": 2,
-			"padding": 1,
-			"tags": [],
-			"tagsSourceEnumUid": null,
-			"enumTags": [],
-			"customData": [],
-			"savedSelections": [],
-			"cachedPixelData": { "opaqueTiles": "0000", "averageColors": "9665966586559665" }
-		},
-		{
 			"__cWid": 8,
 			"__cHei": 8,
 			"identifier": "All_images",
@@ -1153,25 +1115,6 @@
 				"opaqueTiles": "0100000001000000010010000000000000000000000000000000000011100000",
 				"averageColors": "eaa4f994eaa4f883f883000000000000f994f783f994f883f883000000000000ea94f883eaa4e48ef26d00000000000096659654965486547654766586658654966596548554965486548554965486549665966586559665000000000000000095b375b3000000000000000000000000fe3bfe3bfe3c00000000000000000000"
 			}
-		},
-		{
-			"__cWid": 2,
-			"__cHei": 1,
-			"identifier": "Clover",
-			"uid": 169,
-			"relPath": "clover.png",
-			"embedAtlas": null,
-			"pxWid": 18,
-			"pxHei": 9,
-			"tileGridSize": 9,
-			"spacing": 0,
-			"padding": 0,
-			"tags": [],
-			"tagsSourceEnumUid": null,
-			"enumTags": [],
-			"customData": [],
-			"savedSelections": [],
-			"cachedPixelData": { "opaqueTiles": "00", "averageColors": "75a465a4" }
 		}
 	], "enums": [], "externalEnums": [], "levelFields": [] },
 	"levels": [

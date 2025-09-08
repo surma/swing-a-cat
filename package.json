@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "build": "vite build"
+    "build": "vite build && zip -r final.zip dist/*"
   },
   "keywords": [],
   "author": "Surma <surma@surma.dev>",

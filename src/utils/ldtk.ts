@@ -5,6 +5,7 @@ import ldtkFile from "../../swingcat-level-playground.ldtk";
 import { Maybe, must } from "./types";
 import { fromDOMPoint } from "./dommatrix";
 import { hexColor } from "./color";
+import { error } from "./error";
 
 export const gridSize = ldtkFile.defaultGridSize;
 export const textures: Maybe<string>[] = ldtkFile.defs.tilesets.map(
@@ -20,7 +21,7 @@ export const entityDefs = Object.fromEntries(
 
 export function getLevel(name: string) {
   const level = ldtkFile.levels.find((level) => level.identifier == name);
-  if (!level) throw Error(`Unknown level ${name}`);
+  if (!level) error(`Unknown level ${name}`);
   return level;
 }
 
@@ -28,19 +29,19 @@ export function getLayerInstanceFromLevel(level: Level, layerDefUid: number) {
   const layer = level.layerInstances?.find(
     (layer) => layer.layerDefUid == layerDefUid,
   );
-  if (!layer) throw Error(`Level has no ${layer} layer`);
+  if (!layer) error(`Level has no ${layer} layer`);
   return layer;
 }
 
 export function getLayerDefinition(layerName: string) {
   const layerDef = layerDefs[layerName];
-  if (!layerDef) throw Error(`Unknown layer ${layerName}`);
+  if (!layerDef) error(`Unknown layer ${layerName}`);
   return layerDef;
 }
 
 export function getTilesetByUid(tilesetUid: number) {
   const tileset = ldtkFile.defs.tilesets.find((tile) => tile.uid == tilesetUid);
-  if (!tileset) throw Error(`Unknown tileset ${tilesetUid}`);
+  if (!tileset) error(`Unknown tileset ${tilesetUid}`);
   return tileset;
 }
 
@@ -48,7 +49,7 @@ export function getTilesetByIdent(name: string) {
   const tileset = ldtkFile.defs.tilesets.find(
     (tileset) => tileset.identifier === name,
   );
-  if (!tileset) throw Error(`Unknown tileset ${name}`);
+  if (!tileset) error(`Unknown tileset ${name}`);
   return tileset;
 }
 
@@ -56,15 +57,14 @@ export function getTilesetTextureIndexByIdent(tilesetName: string): number {
   const tileset = getTilesetByIdent(tilesetName);
   const textureIndex = textures.indexOf(tileset.relPath);
   if (textureIndex === -1)
-    throw Error(`Texture not found for tileset ${tilesetName}`);
+    error(`Texture not found for tileset ${tilesetName}`);
   return textureIndex;
 }
 
 export function getTilesetTextureIndexByUid(tilesetUid: number): number {
   const tileset = getTilesetByUid(tilesetUid);
   const textureIndex = textures.indexOf(tileset.relPath);
-  if (textureIndex === -1)
-    throw Error(`Texture not found for tileset ${tilesetUid}`);
+  if (textureIndex === -1) error(`Texture not found for tileset ${tilesetUid}`);
   return textureIndex;
 }
 
@@ -74,11 +74,11 @@ export function getEntityFromLayer(layer: LayerInstance, entityName: string) {
 
 export function getEntitiesFromLayer(layer: LayerInstance, entityName: string) {
   const entityUid = entityDefs[entityName]?.uid;
-  if (!entityUid) throw Error(`Unknown entity ${entityName}`);
+  if (!entityUid) error(`Unknown entity ${entityName}`);
   const entity = layer.entityInstances.filter(
     (entity) => entity.defUid == entityUid,
   );
-  if (!entity) throw Error(`Layer has no ${entityName} entity`);
+  if (!entity) error(`Layer has no ${entityName} entity`);
   return entity;
 }
 
@@ -134,12 +134,12 @@ export function ldtkLevel(
   for (const idx of structureLayer.autoLayerTiles.px_x.keys()) {
     const autoTile = {
       px: [
-        structureLayer.autoLayerTiles.px_x[idx],
-        structureLayer.autoLayerTiles.px_y[idx],
+        structureLayer.autoLayerTiles.px_x[idx] * 8,
+        structureLayer.autoLayerTiles.px_y[idx] * 8,
       ],
       src: [
-        structureLayer.autoLayerTiles.src_x[idx],
-        structureLayer.autoLayerTiles.src_y[idx],
+        structureLayer.autoLayerTiles.src_x[idx] * 8,
+        structureLayer.autoLayerTiles.src_y[idx] * 8,
       ],
     };
     const tilePos = vec2(...autoTile.px)

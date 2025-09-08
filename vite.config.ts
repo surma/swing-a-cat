@@ -4,7 +4,12 @@ import closurePlugin from "./closure.plugin";
 
 export default defineConfig({
   build: {
+    modulePreload: {
+      polyfill: false,
+    },
+    assetsInlineLimit: 0,
     minify: "terser",
+    // minify: false,
     target: "esnext",
     sourcemap: true,
   },

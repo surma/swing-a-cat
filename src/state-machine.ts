@@ -1,3 +1,4 @@
+import { error } from "./utils/error";
 import { Maybe } from "./utils/types";
 
 type NextStateName<D, A, E> = Maybe<string> | void;
@@ -30,7 +31,7 @@ export default function stateMachine<D, A, E = {}>(
   function _handleNextState(nextStateName: NextStateName<D, A, E>, action: A) {
     if (!nextStateName) return;
     const nextState = desc[nextStateName];
-    if (!nextState) throw Error(`Invalid state name ${nextStateName}`);
+    if (!nextState) error(`Invalid state name ${nextStateName}`);
     const exitOverride = currentState.exit?.(data, action);
     if (exitOverride) return _handleNextState(exitOverride, action);
     const enterOverride = nextState.enter?.(data, action);

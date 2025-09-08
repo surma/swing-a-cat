@@ -52,16 +52,16 @@ function generateModuleCode(file: types.LdtkFile, imports: string[]): string {
         // of arrays to make gzip happy.
         autoLayerTiles: {
           px_x: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.px[0])
+            .map((tileInstance) => tileInstance.px[0] / 8)
             .flat(),
           px_y: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.px[1])
+            .map((tileInstance) => tileInstance.px[1] / 8)
             .flat(),
           src_x: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.src[0])
+            .map((tileInstance) => tileInstance.src[0] / 8)
             .flat(),
           src_y: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.src[1])
+            .map((tileInstance) => tileInstance.src[1] / 8)
             .flat(),
         },
         entityInstances: layerInstance.entityInstances.map(

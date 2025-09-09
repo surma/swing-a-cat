@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "build": "rm -f final.zip && vite build && zip -r final.zip dist/* && cat final.zip | wc -c"
+    "build": "rm -f final.zip && vite build && zip -9r final.zip dist/* && echo -n 'TOTAL SIZE (Bytes): '&& cat final.zip | wc -c"
   },
   "keywords": [],
   "author": "Surma <surma@surma.dev>",

@@ -30,14 +30,23 @@ interface ExtraStateMethods {
 }
 
 export const DEFAULT_KEYMAP = {
-  ArrowRight: Action.Right,
-  ArrowLeft: Action.Left,
-  Space: Action.Jump,
-  KeyE: Action.Rope,
-  KeyK: Action.Rope,
-  LeftMouse: Action.Rope,
-  default: Action.None,
+  [(window.lol ?? "") + "ArrowRight"]: Action.Right,
+  [(window.lol ?? "") + "ArrowLeft"]: Action.Left,
+  [(window.lol ?? "") + "Space"]: Action.Jump,
+  [(window.lol ?? "") + "KeyE"]: Action.Rope,
+  [(window.lol ?? "") + "KeyK"]: Action.Rope,
+  [(window.lol ?? "") + "LeftMouse"]: Action.Rope,
+  [(window.lol ?? "") + "default"]: Action.None,
 };
+
+const enum State {
+  Idle,
+  Walk,
+  Jump,
+  Falling,
+  Rope,
+}
+
 export class Player extends e.EngineObject {
   static SINGLETON: Player;
   rope: Rope | null = null;
@@ -128,39 +137,39 @@ export class Player extends e.EngineObject {
   initStateMachine() {
     return stateMachine<FsmData, Action, ExtraStateMethods>(
       {
-        idle: {
+        [State.Idle]: {
           input(input): Action {
             return match(DEFAULT_KEYMAP, input);
           },
           update({ player: p, update }, action) {
             update();
-            if (p.rope?.hasHit) return "rope";
+            if (p.rope?.hasHit) return State.Rope;
             if (action == Action.Rope && p.canShootRope) p.shootRope();
             else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
-            if (action == Action.Jump) return "jump";
-            if (!p.groundObject) return "falling";
+            if (action == Action.Jump) return State.Jump;
+            if (!p.groundObject) return State.Falling;
 
             p.velocity = vec2(0);
             p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
 
             p.mirror = action == Action.Left;
-            if (action == Action.Left) return "walk";
-            if (action == Action.Right) return "walk";
+            if (action == Action.Left) return State.Walk;
+            if (action == Action.Right) return State.Walk;
           },
         },
 
-        walk: {
+        [State.Walk]: {
           input(input): Action {
             return match(DEFAULT_KEYMAP, input);
           },
           update({ player: p, update }, action: Action) {
             update();
-            if (p.rope?.hasHit) return "rope";
+            if (p.rope?.hasHit) return State.Rope;
             if (action == Action.Rope && p.canShootRope) p.shootRope();
             else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
-            if (action == Action.None) return "idle";
-            if (action == Action.Jump) return "jump";
-            if (!p.groundObject) return "falling";
+            if (action == Action.None) return State.Idle;
+            if (action == Action.Jump) return State.Jump;
+            if (!p.groundObject) return State.Falling;
 
             p.velocity.x =
               match(
@@ -182,7 +191,7 @@ export class Player extends e.EngineObject {
           },
         },
 
-        jump: {
+        [State.Jump]: {
           input(input): Action {
             return match(DEFAULT_KEYMAP, input);
           },
@@ -191,19 +200,19 @@ export class Player extends e.EngineObject {
             p.applyAcceleration(vec2(0, 0.3));
           },
           update(data, action: Action) {
-            return "falling";
+            return State.Falling;
           },
         },
-        falling: {
+        [State.Falling]: {
           input(input): Action {
             return match(DEFAULT_KEYMAP, input);
           },
           update({ player: p, update }, action: Action) {
             update();
-            if (p.rope?.hasHit) return "rope";
+            if (p.rope?.hasHit) return State.Rope;
             if (action == Action.Rope && p.canShootRope) p.shootRope();
             else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
-            if (p.groundObject) return "idle";
+            if (p.groundObject) return State.Idle;
 
             p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
 
@@ -226,7 +235,7 @@ export class Player extends e.EngineObject {
             );
           },
         },
-        rope: {
+        [State.Rope]: {
           input(input): Action {
             return match(
               {
@@ -250,7 +259,7 @@ export class Player extends e.EngineObject {
             p.velocity = p.velocity.normalize().scale(p.velocity.dot(tangent));
           },
           update({ player: p }, action: Action) {
-            if (action == Action.Rope) return "falling";
+            if (action == Action.Rope) return State.Falling;
 
             if (action == Action.ShortenRope) p.changeRope(-0.1);
             if (action == Action.LengthenRope) p.changeRope(0.1);

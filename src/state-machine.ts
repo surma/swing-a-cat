@@ -29,7 +29,7 @@ export default function stateMachine<D, A, E = {}>(
   let currentState = Object.values(desc)[0];
 
   function _handleNextState(nextStateName: NextStateName<D, A, E>, action: A) {
-    if (!nextStateName) return;
+    if (nextStateName == undefined || nextStateName == null) return;
     const nextState = desc[nextStateName];
     if (!nextState) error(`Invalid state name ${nextStateName}`);
     const exitOverride = currentState.exit?.(data, action);

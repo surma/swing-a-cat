@@ -36,12 +36,17 @@ export default function closure(): PluginOption {
         compilation_level: "ADVANCED",
         jscomp_off: "*",
       });
-      await new Promise((resolve, reject) => {
-        x.run((code, stdout, stderr) => {
-          if (code != 0) reject({ code, stdout, stderr });
-          resolve({ code, stdout, stderr });
-        });
-      });
+      try {
+        await new Promise((resolve, reject) => {
+          x.run((code, stdout, stderr) => {
+            if (code != 0) reject({ code, stdout, stderr });
+            resolve({ code, stdout, stderr });
+          });
+        })
+      } catch (e) {
+        console.error(e.stderr);
+        throw e;
+      }
       const newContent = await readFile(outfile, "utf8");
       bundle[name] = {
         ...contents,

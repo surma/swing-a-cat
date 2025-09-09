@@ -1,2 +1,2 @@
 [build]
-  command = "bash ./install-java.sh && npm run build"
+  command = "./install-java.sh"

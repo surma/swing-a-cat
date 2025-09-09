@@ -131,15 +131,20 @@ export function ldtkLevel(
   const spawnPos = fromGridToWorld(spawn.__grid);
 
   // Process auto-layer tiles if they exist
-  for (const idx of structureLayer.autoLayerTiles.px_x.keys()) {
+  const encodedAUtoLayer = atob(structureLayer?.autoLayerTiles);
+  const decodedAutoLayer = encodedAUtoLayer
+    .split("")
+    .map((_, i) => encodedAUtoLayer.charCodeAt(i));
+  const numAutoLayerTiles = decodedAutoLayer.length / 4;
+  for (let i = 0; i < numAutoLayerTiles; i++) {
     const autoTile = {
       px: [
-        structureLayer.autoLayerTiles.px_x[idx] * 8,
-        structureLayer.autoLayerTiles.px_y[idx] * 8,
+        decodedAutoLayer[i] * 8,
+        decodedAutoLayer[i + numAutoLayerTiles] * 8,
       ],
       src: [
-        structureLayer.autoLayerTiles.src_x[idx] * 8,
-        structureLayer.autoLayerTiles.src_y[idx] * 8,
+        decodedAutoLayer[i + 2 * numAutoLayerTiles] * 8,
+        decodedAutoLayer[i + 3 * numAutoLayerTiles] * 8,
       ],
     };
     const tilePos = vec2(...autoTile.px)

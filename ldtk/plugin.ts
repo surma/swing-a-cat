@@ -50,20 +50,22 @@ function generateModuleCode(file: types.LdtkFile, imports: string[]): string {
         ...pick(layerInstance, "layerDefUid"),
         // This is the least compressible data structure. Turn the Array of Structs into a struct
         // of arrays to make gzip happy.
-        autoLayerTiles: {
-          px_x: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.px[0] / 8)
-            .flat(),
-          px_y: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.px[1] / 8)
-            .flat(),
-          src_x: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.src[0] / 8)
-            .flat(),
-          src_y: layerInstance.autoLayerTiles
-            .map((tileInstance) => tileInstance.src[1] / 8)
-            .flat(),
-        },
+        autoLayerTiles: btoa(
+          String.fromCodePoint(
+            ...layerInstance.autoLayerTiles
+              .map((tileInstance) => tileInstance.px[0] / 8)
+              .flat(),
+            ...layerInstance.autoLayerTiles
+              .map((tileInstance) => tileInstance.px[1] / 8)
+              .flat(),
+            ...layerInstance.autoLayerTiles
+              .map((tileInstance) => tileInstance.src[0] / 8)
+              .flat(),
+            ...layerInstance.autoLayerTiles
+              .map((tileInstance) => tileInstance.src[1] / 8)
+              .flat(),
+          ),
+        ),
         entityInstances: layerInstance.entityInstances.map(
           (entityInstance) => ({
             ...pick(

@@ -8,31 +8,9 @@ export function match<K extends keyof any, V>(
   return f;
 }
 
-export function clamp({
-  min = Number.NEGATIVE_INFINITY,
-  max = Number.EPSILON,
-  v,
-}) {
-  if (v > max) return max;
-  if (v < min) return min;
-  return v;
-}
-
 export function pick<T, K extends Array<keyof T>>(obj: T, ...keys: K): T {
   const keyset = new Set(keys);
   return Object.fromEntries(
     Object.entries(obj).filter(([k, v]) => keyset.has(k)),
   );
-}
-
-export function remap(opts) {
-  const { vin, vout, v } = opts;
-  let p = (v - vin.min) / (vin.max - vin.min);
-  if (opts.clamp ?? true) {
-    p = clamp({ v: p, min: 0, max: 1 });
-  }
-  if (Number.isNaN(p)) {
-    p = 0;
-  }
-  return (vout.max - vout.min) * p + vout.min;
 }

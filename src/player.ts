@@ -5,7 +5,8 @@ import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
 import { leap, meow, clover } from "./sounds";
-import { clamp, match, remap } from "./utils/helpers";
+import { match } from "./utils/helpers";
+import { remap } from "./utils/littlejsutils";
 
 export enum Action {
   None,
@@ -213,11 +214,13 @@ export class Player extends e.EngineObject {
             p.applyForce(
               vec2(
                 factor *
-                  remap({
-                    vin: { min: 0, max: factor },
-                    vout: { min: p.AIR_CONTROL, max: 0 },
-                    v: p.velocity.x / p.AIR_CONTROL,
-                  }),
+                  remap(
+                    p.velocity.x / p.AIR_CONTROL,
+                    0,
+                    factor,
+                    p.AIR_CONTROL,
+                    0,
+                  ),
                 0,
               ),
             );

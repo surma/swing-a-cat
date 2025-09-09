@@ -1,7 +1,6 @@
 import * as e from "littlejsengine";
 import { vec2 } from "littlejsengine";
 import { Player } from "./player";
-import { clamp } from "./utils/helpers";
 import { meow } from "./sounds";
 import { error } from "./utils/error";
 
@@ -47,7 +46,7 @@ export class Rope extends e.EngineObject {
   }
 
   set length(newLength: number) {
-    newLength = clamp({ v: newLength, max: this.maxLength });
+    newLength = e.clamp(newLength, 0, this.maxLength);
     if (!this.anchor) error("Trying to set length on a non-hitting rope");
     this.start.pos = this.anchor.add(
       this.direction!.normalize().scale(newLength),

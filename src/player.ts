@@ -8,7 +8,7 @@ import { leap, meow, clover } from "./sounds";
 import { match } from "./utils/helpers";
 import { remap } from "./utils/littlejsutils";
 
-export enum Action {
+export const enum Action {
   None,
   Left,
   Right,

@@ -12,6 +12,8 @@ import * as entities from "./entities";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
+let level: ReturnType<typeof ldtkLevel>;
+
 function gameInit() {
   e.setCameraScale(gridSize * 3);
   // e.setCanvasFixedSize(vec2(384, 216));
@@ -25,18 +27,32 @@ function gameInit() {
   // (inside ldtkLevel()), and I don't wanna grab the data manually lol.
   e.initTileCollision(vec2(100, 70));
 
-  const { layer, spawnPos, entities: ent } = ldtkLevel("Level_1", entities);
-  layer.collideRaycast = true;
-  layer.collideSolidObjects = true;
-  layer.collideTiles = true;
-  layer.redraw();
+  level = ldtkLevel("Level_1", entities);
+  level.layer.collideRaycast = true;
+  level.layer.collideSolidObjects = true;
+  level.layer.collideTiles = true;
+  level.layer.redraw();
 
-  Player.SINGLETON = new Player(spawnPos);
-  e.setCameraPos(spawnPos);
+  Player.SINGLETON = new Player(level.spawnPos);
+  e.setCameraPos(level.spawnPos);
 }
 
 function gameUpdate() {
   updateCamera();
+}
+
+function checkDeath() {
+  const p = Player.SINGLETON;
+  const collisionPoint = e.tileCollisionRaycast(
+    p.pos,
+    p.pos.subtract(vec2(0, 1)),
+  );
+  if (!collisionPoint) return;
+  const tileData = level.layer.getData(collisionPoint);
+  if (tileData.tile == 13) {
+    p.pos.set(level.spawnPos.x, level.spawnPos.y);
+    p.velocity.set(0, 0);
+  }
 }
 
 function updateCamera() {
@@ -58,6 +74,7 @@ function gameUpdatePost() {
     p.action(p.stateMachine.currentState.input("LeftMouse"));
   if (e.mouseWasPressed(2))
     p.action(p.stateMachine.currentState.input("RightMouse"));
+  checkDeath();
 }
 
 function gameRender() {}

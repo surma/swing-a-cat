@@ -8,7 +8,7 @@ import stateMachine, {
   StateMachineInstance,
 } from "./state-machine";
 import { Action, DEFAULT_KEYMAP, Player } from "./player";
-import * as entities from "./entities";
+import entities from "./entities";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 

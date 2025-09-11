@@ -4,7 +4,6 @@
 // LittleJS Engine - MIT License - Copyright 2021 Frank Force
 // https://github.com/KilledByAPixel/LittleJS
 
-
 "use strict";
 
 /**

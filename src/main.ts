@@ -3,6 +3,7 @@ import { vec2, PI, tile, hsl } from "littlejsengine";
 import { ldtkLevel, gridSize, textures } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import "./music";
+import { splash } from "./sounds";
 import stateMachine, {
   StateMachine,
   StateMachineInstance,
@@ -52,6 +53,7 @@ function checkDeath() {
   if (tileData.tile == 13) {
     p.pos.set(level.spawnPos.x, level.spawnPos.y);
     p.velocity.set(0, 0);
+    splash.play();
   }
 }
 

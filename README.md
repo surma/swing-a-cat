@@ -4,16 +4,16 @@ A pixel art platformer for [js13k](https://js13kgames.com/) 2025 where you play 
 
 ## 🕹️ How To Play
 
-🐈‍⬛ Clover the Cat is an Acrobat.
-☘️ Help Clover eat more delicious clovers and grow big and long.
-🍀 Find the rare and elusive four-leaf clover to win. 
+🐈‍⬛ Clover the Cat is an Acrobat.  
+☘️ Help Clover eat more delicious clovers and grow big and long.  
+🍀 Find the rare and elusive four-leaf clover to win.  
 
-A and D to move left and right. 
-Space to jump.
-Aim and click to make Clover do that thang. 
-A and D to make it swang.
-W and S for little and long. 
-Click or space to release.
+A and D to move left and right.  
+Space to jump.  
+Aim and click to make Clover do that thang.  
+A and D to make it swang.  
+W and S for little and long.  
+Click or space to release.  
 
 
 ## 🚀 Quick Start
@@ -47,7 +47,7 @@ npx vitest
 
 13264 Bytes
 
-## Team
+## 👥 Team
 
 - [Surma](https://github.com/surma)
 - [Stim](https://github.com/stimhub)

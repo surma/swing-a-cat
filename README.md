@@ -2,7 +2,6 @@
 
 A pixel art platformer for [js13k](https://js13kgames.com/) 2025 where you play as the acrobatic Clover the Cat. Collect three-leaf clovers to lengthen your tail in the hopes of reaching the rare and elusive four-leaf clover.
 
-
 ## 🚀 Quick Start
 
 ```bash
@@ -32,7 +31,7 @@ npx vitest
 
 ## 📦 Current Build Size
 
-13308 Bytes
+13264 Bytes
 
 ## Team
 
@@ -45,4 +44,4 @@ Apache 2.0
 
 ---
 
-*Built with ❤️ for js13k 2025*
+_Built with ❤️ for js13k 2025_

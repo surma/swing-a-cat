@@ -240,9 +240,9 @@ export class Player extends e.EngineObject {
             return match(
               {
                 ...DEFAULT_KEYMAP,
-                ArrowUp: Action.ShortenRope,
-                ArrowDown: Action.LengthenRope,
-                Space: Action.Rope,
+                [(window.lol ?? "") + "ArrowUp"]: Action.ShortenRope,
+                [(window.lol ?? "") + "ArrowDown"]: Action.LengthenRope,
+                [(window.lol ?? "") + "Space"]: Action.Rope,
               },
               input,
             );

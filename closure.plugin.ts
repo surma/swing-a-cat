@@ -42,7 +42,7 @@ export default function closure(): PluginOption {
             if (code != 0) reject({ code, stdout, stderr });
             resolve({ code, stdout, stderr });
           });
-        })
+        });
       } catch (e) {
         console.error(e.stderr);
         throw e;

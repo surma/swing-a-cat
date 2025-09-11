@@ -110,11 +110,10 @@ export class Player extends e.EngineObject {
     this.tileInfo = tile(0, vec2(gridSize), catTextureIndex, 1);
 
     this.collideTiles = true;
-    this.collideRaycast = false;
   }
 
   get isRopeActive() {
-    return this.rope && this.rope.hasHit;
+    return this.rope?.hasHit;
   }
 
   get canShootRope() {

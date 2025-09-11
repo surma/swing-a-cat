@@ -3,6 +3,7 @@ import { vec2 } from "littlejsengine";
 import { Player } from "./player";
 import { meow } from "./sounds";
 import { error } from "./utils/error";
+import { Vector2 } from "../littlejs.esm";
 
 export class Rope extends e.EngineObject {
   static SHOOT_SPEED = 1;
@@ -11,16 +12,16 @@ export class Rope extends e.EngineObject {
   private shootTravel: number = 0;
   private shootDuration: number = 0;
   constructor(
-    public readonly start: e.EngineObject,
+    public readonly p: Player,
     direction: e.Vector2,
     public readonly maxLength: number,
   ) {
-    super(start.pos, vec2(1, 1));
+    super(p.pos, vec2(1, 1));
     direction = direction.normalize();
-    this.end = start.pos.add(direction.scale(maxLength));
-    this.anchor = e.tileCollisionRaycast(start.pos, this.end);
+    this.end = p.pos.add(direction.scale(maxLength));
+    this.anchor = e.tileCollisionRaycast(p.pos, this.end);
     if (this.anchor) this.end = this.anchor;
-    this.shootDuration = this.end.distance(start.pos) * Rope.SHOOT_SPEED;
+    this.shootDuration = this.end.distance(p.pos) * Rope.SHOOT_SPEED;
     meow.play();
   }
 
@@ -37,20 +38,18 @@ export class Rope extends e.EngineObject {
   }
 
   get length(): number {
-    return this.end.distance(this.start.pos);
+    return this.end.distance(this.p.pos);
   }
 
   get direction() {
     if (!this.anchor) return null;
-    return this.start.pos.subtract(this.anchor);
+    return this.p.pos.subtract(this.anchor);
   }
 
   set length(newLength: number) {
     newLength = e.clamp(newLength, 0, this.maxLength);
     if (!this.anchor) error("Trying to set length on a non-hitting rope");
-    this.start.pos = this.anchor.add(
-      this.direction!.normalize().scale(newLength),
-    );
+    this.p.pos = this.anchor.add(this.direction!.normalize().scale(newLength));
   }
 
   update(): void {
@@ -62,11 +61,7 @@ export class Rope extends e.EngineObject {
   }
 
   render(): void {
-    e.drawLine(
-      this.start.pos,
-      this.start.pos.lerp(this.end, this.percentDone),
-      0.1,
-      e.BLACK,
-    );
+    const f = this.p.pos.add(vec2(0.5, 0).scale(this.p.mirror ? 1 : -1));
+    e.drawLine(f, f.lerp(this.end, this.percentDone), 0.1, e.BLACK);
   }
 }

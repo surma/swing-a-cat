@@ -1,5 +1,9 @@
+// Note (@surma): This is vendored from node_modules because out of desperation
+// I removed some code from the engine itself to save bytes. Sorry.
+
 // LittleJS Engine - MIT License - Copyright 2021 Frank Force
 // https://github.com/KilledByAPixel/LittleJS
+
 
 "use strict";
 

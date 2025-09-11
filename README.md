@@ -1,4 +1,4 @@
-# To Swing a Cat
+# Swing a Cat
 
 A pixel art platformer for [js13k](https://js13kgames.com/) 2025 where you play as the acrobatic Clover the Cat. Collect three-leaf clovers to lengthen your tail in the hopes of reaching the rare and elusive four-leaf clover.
 

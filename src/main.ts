@@ -26,7 +26,7 @@ function gameInit() {
 
   // Hardcoding this because this call MUST happen before I create a TileLayer
   // (inside ldtkLevel()), and I don't wanna grab the data manually lol.
-  e.initTileCollision(vec2(100, 70));
+  e.initTileCollision(vec2(200, 200));
 
   level = ldtkLevel("Level_1", entities);
   level.layer.collideRaycast = true;

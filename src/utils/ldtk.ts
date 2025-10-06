@@ -141,6 +141,13 @@ export function ldtkLevel(name: string, entityList: Record<string, any>) {
     const tileX = Math.floor(srcX / gridSize);
     const tileY = Math.floor(srcY / gridSize);
     const tileIndex = tileY * structureTileset.__cWid + tileX;
+    if ((autoTile.f & 1) > 0) {
+      data.mirror = !data.mirror;
+    }
+    if ((autoTile.f & 2) > 0) {
+      data.direction = 2;
+      data.mirror = !data.mirror;
+    }
 
     data.tile = tileIndex;
 

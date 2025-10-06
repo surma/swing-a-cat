@@ -1290,7 +1290,7 @@
 						},
 						{
 							"__identifier": "Spawn",
-							"__grid": [84,5],
+							"__grid": [85,65],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -1299,7 +1299,7 @@
 							"width": 8,
 							"height": 8,
 							"defUid": 113,
-							"px": [676,44],
+							"px": [684,524],
 							"fieldInstances": []
 						},
 						{
@@ -1374,7 +1374,7 @@
 						},
 						{
 							"__identifier": "Win",
-							"__grid": [91,69],
+							"__grid": [90,68],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": { "tilesetUid": 259, "x": 0, "y": 0, "w": 10, "h": 10 },
@@ -1383,7 +1383,7 @@
 							"width": 8,
 							"height": 8,
 							"defUid": 258,
-							"px": [732,556],
+							"px": [724,548],
 							"fieldInstances": []
 						}
 					]

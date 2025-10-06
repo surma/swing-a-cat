@@ -30,11 +30,11 @@ interface ExtraStateMethods {
 }
 
 export const DEFAULT_KEYMAP = {
-  [(window.lol ?? "") + "ArrowRight"]: Action.Right,
-  [(window.lol ?? "") + "ArrowLeft"]: Action.Left,
-  [(window.lol ?? "") + "Space"]: Action.Jump,
-  [(window.lol ?? "") + "LeftMousePress"]: Action.Rope,
-  [(window.lol ?? "") + "default"]: Action.None,
+  ArrowRight: Action.Right,
+  ArrowLeft: Action.Left,
+  Space: Action.Jump,
+  LeftMousePress: Action.Rope,
+  default: Action.None,
 };
 
 const enum State {
@@ -242,9 +242,9 @@ export class Player extends e.EngineObject {
             return match(
               {
                 ...DEFAULT_KEYMAP,
-                [(window.lol ?? "") + "ArrowUp"]: Action.ShortenRope,
-                [(window.lol ?? "") + "ArrowDown"]: Action.LengthenRope,
-                [(window.lol ?? "") + "LeftMouseRelease"]: Action.Rope,
+                ArrowUp: Action.ShortenRope,
+                ArrowDown: Action.LengthenRope,
+                LeftMouseRelease: Action.Rope,
               },
               input,
             );

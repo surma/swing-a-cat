@@ -17,7 +17,7 @@ export default defineConfig({
   },
   plugins: [
     ldtkLoaderPlugin(),
-    closurePlugin(),
+    // closurePlugin(),
     soundPlugin(),
     inlinejsPlugin(),
   ],

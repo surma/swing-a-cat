@@ -50,7 +50,7 @@ function checkDeath() {
   );
   if (!collisionPoint) return;
   const tileData = level.layer.getData(collisionPoint);
-  if (tileData.tile == 13) {
+  if (tileData.tile == 19) {
     p.reset();
     splash.play();
   }

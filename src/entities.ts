@@ -29,7 +29,6 @@ export class BaseClover extends e.EngineObject {
 }
 
 export class Clover3 extends BaseClover {
-  static key = "Clover3";
   onHit() {
     /* Player.SINGLETON.maxRopeLength += 1; */
     Player.SINGLETON.spawn = this.pos.copy();
@@ -39,7 +38,6 @@ export class Clover3 extends BaseClover {
 }
 
 export class Clover4 extends BaseClover {
-  static key = "Clover4";
   onHit() {
     Player.SINGLETON.maxRopeLength += 1;
     Player.SINGLETON.spawn = this.pos.copy();
@@ -48,8 +46,7 @@ export class Clover4 extends BaseClover {
   }
 }
 
-export class OrangeCat extends BaseClover {
-  static key = "Win";
+export class Win extends BaseClover {
   private won = false;
   onHit() {
     this.won = true;
@@ -63,6 +60,3 @@ export class OrangeCat extends BaseClover {
     }
   }
 }
-
-
-export default [Clover3, Clover4];

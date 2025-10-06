@@ -195,7 +195,7 @@ export class Player extends e.EngineObject {
 
         [State.Jump]: {
           input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
+            return match({ ...DEFAULT_KEYMAP, Space: null }, input);
           },
           enter({ player: p }, action) {
             leap.play();
@@ -207,7 +207,7 @@ export class Player extends e.EngineObject {
         },
         [State.Falling]: {
           input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
+            return match({ ...DEFAULT_KEYMAP, Space: null }, input);
           },
           update({ player: p, update }, action: Action) {
             update();

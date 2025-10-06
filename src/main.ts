@@ -67,7 +67,8 @@ function gameUpdatePost() {
   const KEYS = [...Object.keys(DEFAULT_KEYMAP), "ArrowUp", "ArrowDown"];
   for (const key of KEYS) {
     if (e.keyIsDown(key)) {
-      p.action(p.stateMachine.currentState.input(key));
+      const action = p.stateMachine.currentState.input(key);
+      if (action) p.action(action);
     }
   }
 

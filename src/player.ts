@@ -48,7 +48,12 @@ const enum State {
 export class Player extends e.EngineObject {
   static SINGLETON: Player;
   rope: Rope | null = null;
-  textureIndex = getTilesetTextureIndexByIdent("All_images");
+  textures = Object.fromEntries(
+    ["idle", "jump", "run"].map((id) => [
+      id,
+      getTilesetTextureIndexByIdent(`Cat_${id}`),
+    ]),
+  );
   SPEED: number = 0.12;
   AIR_CONTROL: number = 0.15;
   lastPos: [e.Vector2, e.Vector2];
@@ -105,9 +110,7 @@ export class Player extends e.EngineObject {
     this.lastPos = [pos.copy(), pos.copy()];
     this.size = vec2(1, 1);
 
-    // Get Cat tileset texture index and create tile reference
-    const catTextureIndex = getTilesetTextureIndexByIdent("All_images");
-    this.tileInfo = tile(0, vec2(gridSize), catTextureIndex, 1);
+    this.tileInfo = tile(0, vec2(gridSize), this.textures.idle, 1);
 
     this.collideTiles = true;
   }
@@ -149,7 +152,7 @@ export class Player extends e.EngineObject {
             if (!p.groundObject) return State.Falling;
 
             p.velocity = vec2(0);
-            p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
+            p.tileInfo = tile(0, vec2(gridSize), p.textures.idle, 1);
 
             p.mirror = action == Action.Left;
             if (action == Action.Left) return State.Walk;
@@ -182,10 +185,10 @@ export class Player extends e.EngineObject {
               p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
             }
             p.tileInfo = tile(
-              15 + p.animationFrame,
+              p.animationFrame,
               vec2(gridSize),
-              p.textureIndex,
-              0,
+              p.textures.run,
+              1,
             );
           },
         },
@@ -213,7 +216,7 @@ export class Player extends e.EngineObject {
             else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
             if (p.groundObject) return State.Idle;
 
-            p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
+            p.tileInfo = tile(15, vec2(gridSize), p.textures.jump, 1);
 
             const factor = match(
               { [Action.Left]: -1, [Action.Right]: 1, default: 0 },

@@ -60,6 +60,7 @@ export class Player extends e.EngineObject {
   totalFrames: number = 4;
   isMoving: boolean = false;
   nextAction: Maybe<Action> = null;
+  spawn: e.Vector2;
 
   ropeAngle: number = 0;
   ropeAngularVelocity: number = 0;
@@ -101,6 +102,7 @@ export class Player extends e.EngineObject {
 
   constructor(pos: e.Vector2) {
     super(pos);
+    this.spawn = pos;
 
     this.lastPos = [pos.copy(), pos.copy()];
     this.size = vec2(1, 1);
@@ -318,5 +320,11 @@ export class Player extends e.EngineObject {
     if (!this.rope?.hasHit) return;
     const dir = this.pos.subtract(this.rope.anchor!);
     this.pos = this.rope.anchor!.add(dir.normalize().scale(this.rope.length));
+  }
+
+  reset() {
+    this.releaseRope();
+    this.pos = this.spawn.copy();
+    this.velocity = vec2(0);
   }
 }

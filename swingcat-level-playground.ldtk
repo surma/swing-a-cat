@@ -1250,6 +1250,34 @@
 							"defUid": 113,
 							"px": [28,60],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "Clover3",
+							"__grid": [12,4],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": { "tilesetUid": 130, "x": 8, "y": 32, "w": 8, "h": 8 },
+							"__smartColor": "#35C040",
+							"iid": "aabdf1e0-8560-11f0-98ac-2d67a6249b6a",
+							"width": 8,
+							"height": 8,
+							"defUid": 167,
+							"px": [100,36],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Clover3",
+							"__grid": [25,8],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": { "tilesetUid": 130, "x": 8, "y": 32, "w": 8, "h": 8 },
+							"__smartColor": "#35C040",
+							"iid": "ac29b6e0-8560-11f0-98ac-d77339b17cbc",
+							"width": 8,
+							"height": 8,
+							"defUid": 167,
+							"px": [204,68],
+							"fieldInstances": []
 						}
 					]
 				},

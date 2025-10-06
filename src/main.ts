@@ -51,8 +51,7 @@ function checkDeath() {
   if (!collisionPoint) return;
   const tileData = level.layer.getData(collisionPoint);
   if (tileData.tile == 13) {
-    p.pos.set(level.spawnPos.x, level.spawnPos.y);
-    p.velocity.set(0, 0);
+    p.reset();
     splash.play();
   }
 }

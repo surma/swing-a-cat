@@ -32,6 +32,7 @@ export class Clover3 extends BaseClover {
   static key = "Clover3";
   onHit() {
     Player.SINGLETON.maxRopeLength += 1;
+    Player.SINGLETON.spawn = this.pos.copy();
     clover.play();
     this.destroy();
   }

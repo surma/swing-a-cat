@@ -72,9 +72,9 @@ function gameUpdatePost() {
   }
 
   if (e.mouseWasPressed(0))
-    p.action(p.stateMachine.currentState.input("LeftMouse"));
-  if (e.mouseWasPressed(2))
-    p.action(p.stateMachine.currentState.input("RightMouse"));
+    p.action(p.stateMachine.currentState.input("LeftMousePress"));
+  if (e.mouseWasReleased(0))
+    p.action(p.stateMachine.currentState.input("LeftMouseRelease"));
   checkDeath();
 }
 

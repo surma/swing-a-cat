@@ -33,9 +33,7 @@ export const DEFAULT_KEYMAP = {
   [(window.lol ?? "") + "ArrowRight"]: Action.Right,
   [(window.lol ?? "") + "ArrowLeft"]: Action.Left,
   [(window.lol ?? "") + "Space"]: Action.Jump,
-  [(window.lol ?? "") + "KeyE"]: Action.Rope,
-  [(window.lol ?? "") + "KeyK"]: Action.Rope,
-  [(window.lol ?? "") + "LeftMouse"]: Action.Rope,
+  [(window.lol ?? "") + "LeftMousePress"]: Action.Rope,
   [(window.lol ?? "") + "default"]: Action.None,
 };
 
@@ -243,7 +241,7 @@ export class Player extends e.EngineObject {
                 ...DEFAULT_KEYMAP,
                 [(window.lol ?? "") + "ArrowUp"]: Action.ShortenRope,
                 [(window.lol ?? "") + "ArrowDown"]: Action.LengthenRope,
-                [(window.lol ?? "") + "Space"]: Action.Rope,
+                [(window.lol ?? "") + "LeftMouseRelease"]: Action.Rope,
               },
               input,
             );

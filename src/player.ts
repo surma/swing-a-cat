@@ -326,5 +326,6 @@ export class Player extends e.EngineObject {
     this.releaseRope();
     this.pos = this.spawn.copy();
     this.velocity = vec2(0);
+    this.stateMachine.setState(State.Idle);
   }
 }

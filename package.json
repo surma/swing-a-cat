@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "google-closure-compiler": "^20250903.0.0",
+    "littlejsengine": "^1.11.8",
     "terser": "^5.42.0",
     "vite": "^6.3.5"
   }

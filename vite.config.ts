@@ -21,11 +21,6 @@ export default defineConfig({
     soundPlugin(),
     inlinejsPlugin(),
   ],
-  resolve: {
-    alias: {
-      littlejsengine: new URL("./littlejs.esm.js", import.meta.url).pathname,
-    },
-  },
   test: {
     browser: {
       enabled: true,

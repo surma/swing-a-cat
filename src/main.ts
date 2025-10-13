@@ -11,11 +11,9 @@ import stateMachine, {
 import { Action, DEFAULT_KEYMAP, Player } from "./player";
 import * as entities from "./entities";
 
-const KILL_TILES = [19, 20];
-
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
-let level: ReturnType<typeof ldtkLevel>;
+export let level: ReturnType<typeof ldtkLevel>;
 
 function gameInit() {
   e.setCameraScale(gridSize * 3);
@@ -44,19 +42,6 @@ function gameUpdate() {
   updateCamera();
 }
 
-function checkDeath() {
-  const p = Player.SINGLETON;
-  const killDirections = [vec2(0, 0.51), vec2(0.6, 0), vec2(-0.6, 0)];
-  const hitTiles = killDirections
-    .map((dir) => e.tileCollisionRaycast(p.pos, p.pos.subtract(dir)))
-    .filter((p) => !!p)
-    .map((p) => level.layer.getData(p));
-  if (hitTiles.some((t) => KILL_TILES.includes(t.tile))) {
-    p.reset();
-    splash.play();
-  }
-}
-
 function updateCamera() {
   const CAMERA_LAG = 0.1;
   const toPlayerVec = Player.SINGLETON.pos.subtract(e.cameraPos);
@@ -77,7 +62,7 @@ function gameUpdatePost() {
     p.action(p.stateMachine.currentState.input("LeftMousePress"));
   if (e.mouseWasReleased(0))
     p.action(p.stateMachine.currentState.input("LeftMouseRelease"));
-  checkDeath();
+  p.checkDeath();
 }
 
 function gameRender() {}

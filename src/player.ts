@@ -4,9 +4,12 @@ import { getTilesetTextureIndexByIdent, gridSize } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
-import { leap, meow, clover } from "./sounds";
+import { leap, meow, clover, splash } from "./sounds";
 import { match } from "./utils/helpers";
 import { remap } from "./utils/littlejsutils";
+import { level } from "./main";
+
+const KILL_TILES = [19, 20];
 
 export const enum Action {
   None,
@@ -285,7 +288,8 @@ export class Player extends e.EngineObject {
 
             const oldPos = p.pos.copy();
             p.pos = newPos;
-            const collision = e.tileCollisionTest(p.pos, vec2(1.5));
+            p.checkDeath();
+            const collision = e.tileCollisionTest(p.pos, vec2(1.1));
             if (collision) {
               p.pos = oldPos;
               p.ropeAngularVelocity *= -1;
@@ -302,6 +306,18 @@ export class Player extends e.EngineObject {
     );
   }
 
+  checkDeath() {
+    const killDirections = [vec2(0, 0.7), vec2(0.6, 0), vec2(-0.6, 0)];
+    const hitTiles = killDirections
+      .map((dir) => e.tileCollisionRaycast(this.pos, this.pos.subtract(dir)))
+      .filter((p) => !!p)
+      .map((p) => level.layer.getData(p));
+    const isDead = hitTiles.some((t) => KILL_TILES.includes(t.tile));
+    if (isDead) {
+      this.reset();
+      splash.play();
+    }
+  }
   action(action: Action) {
     this.nextAction = action;
   }

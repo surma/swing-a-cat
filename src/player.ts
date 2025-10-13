@@ -129,7 +129,7 @@ export class Player extends e.EngineObject {
     const dir = this.rope!.direction!.normalize();
     let nextPos = this.pos.add(dir.scale(delta));
     while (e.tileCollisionTest(nextPos, vec2(1.5))) {
-      nextPos = nextPos.subtract(dir.scale(0.1));
+      nextPos = nextPos.subtract(dir.scale(Math.sign(delta + 0.00001) * 0.1));
     }
 
     this.rope!.length = this.rope!.anchor!.distance(nextPos);

@@ -24,7 +24,7 @@ function gameInit() {
   e.setGravity(-0.018);
   e.setInputWASDEmulateDirection(true);
 
-  document.body.style.background = "#506d8bff";
+  document.body.style.background = "#89a8bbff";
 
   // Hardcoding this because this call MUST happen before I create a TileLayer
   // (inside ldtkLevel()), and I don't wanna grab the data manually lol.

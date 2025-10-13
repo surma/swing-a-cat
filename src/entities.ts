@@ -85,6 +85,7 @@ export class TextTrigger extends e.EngineObject {
   private color: e.Color;
   private verticalOffset: number;
   private fontSize: number;
+  private font: string;
   constructor(
     pos: e.Vector2,
     size: e.Vector2,
@@ -98,6 +99,9 @@ export class TextTrigger extends e.EngineObject {
     this.fontSize = fields.find((f) => f.__identifier == "fontSize")?.__value;
     this.verticalOffset = fields.find(
       (f) => f.__identifier == "verticalOffset",
+    )?.__value;
+    this.font = fields.find(
+      (f) => f.__identifier == "font",
     )?.__value;
   }
 
@@ -126,6 +130,10 @@ export class TextTrigger extends e.EngineObject {
         this.pos.add(vec2(0, this.verticalOffset)),
         this.fontSize,
         this.color,
+        undefined,
+        undefined,
+        undefined,
+        this.font
       );
     }
   }

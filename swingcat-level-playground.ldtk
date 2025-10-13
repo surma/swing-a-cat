@@ -1647,7 +1647,7 @@
 						},
 						{
 							"__identifier": "Spawn",
-							"__grid": [126,112],
+							"__grid": [126,52],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -1656,7 +1656,7 @@
 							"width": 8,
 							"height": 8,
 							"defUid": 113,
-							"px": [1012,900],
+							"px": [1012,420],
 							"fieldInstances": []
 						},
 						{
@@ -1840,7 +1840,7 @@
 						},
 						{
 							"__identifier": "TextTrigger",
-							"__grid": [126,49],
+							"__grid": [126,51],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -1849,7 +1849,7 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 279,
-							"px": [1012,396],
+							"px": [1012,412],
 							"fieldInstances": [
 								{ "__identifier": "text", "__type": "Multilines", "__value": "Clover the Cat is an Acrobat.\nHelp Clover eat delicious ☘️ clovers ☘️ \nto feel safe and strong.\nFind the rare four-leaf 🍀 clovers 🍀 \nto grow big and long.\n\nA and D to move left and right.\nSpace to jump. (Use your left thumb)", "__tile": null, "defUid": 281, "realEditorValues": [{
 									"id": "V_String",

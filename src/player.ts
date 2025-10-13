@@ -127,9 +127,10 @@ export class Player extends e.EngineObject {
     if (!this.isRopeActive) return;
 
     const dir = this.rope!.direction!.normalize();
-    let nextPos = this.pos.add(dir.scale(delta));
-    while (e.tileCollisionTest(nextPos, vec2(1.5))) {
-      nextPos = nextPos.subtract(dir.scale(Math.sign(delta + 0.00001) * 0.1));
+    const step = dir.scale(delta);
+    let nextPos = this.pos.add(step);
+    if (e.tileCollisionTest(nextPos, vec2(1.5))) {
+      nextPos = nextPos.subtract(step);
     }
 
     this.rope!.length = this.rope!.anchor!.distance(nextPos);
@@ -250,10 +251,6 @@ export class Player extends e.EngineObject {
             );
           },
           enter({ player: p }, action) {
-            // Changing the length rope by 0 triggeres
-            // the code that makes sure we are not colliding
-            p.changeRope(0);
-
             const ropeVector = p.pos.subtract(p.rope!.anchor!);
             p.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
 

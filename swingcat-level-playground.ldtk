@@ -1399,7 +1399,7 @@
 					"max": null,
 					"regex": null,
 					"acceptFileTypes": null,
-					"defaultOverride": { "id": "V_Int", "params": [16777215] },
+					"defaultOverride": { "id": "V_Int", "params": [1315860] },
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -1787,27 +1787,7 @@
 						},
 						{
 							"__identifier": "TextTrigger",
-							"__grid": [125,51],
-							"__pivot": [0.5,0.5],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#FFFFFF",
-							"iid": "584b9860-8560-11f0-9a68-1b0ee64f4e14",
-							"width": 32,
-							"height": 32,
-							"defUid": 279,
-							"px": [1004,412],
-							"fieldInstances": [
-								{ "__identifier": "text", "__type": "Multilines", "__value": "🐈‍⬛ Clover the Cat is an Acrobat.\n☘️ Help Clover eat delicious clovers to feel safe and strong.\n🍀 Find the rare four-leaf clovers to grow big and long.\nA and D to move left and right.\nSpace to jump. (Use your left thumb)", "__tile": null, "defUid": 281, "realEditorValues": [] },
-								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
-								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [] },
-								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 0, "__tile": null, "defUid": 284, "realEditorValues": [] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [null] }
-							]
-						},
-						{
-							"__identifier": "TextTrigger",
-							"__grid": [106,53],
+							"__grid": [105,53],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -1816,7 +1796,7 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 279,
-							"px": [852,428],
+							"px": [844,428],
 							"fieldInstances": [
 								{ "__identifier": "text", "__type": "Multilines", "__value": "Aim and click to make Clover do that thang.\nA and D to make it swang.\nW and S for little and long.\nClick or space to release.", "__tile": null, "defUid": 281, "realEditorValues": [{
 									"id": "V_String",
@@ -1825,9 +1805,9 @@
 									]
 								}] },
 								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
-								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [] },
-								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 0, "__tile": null, "defUid": 284, "realEditorValues": [] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [] }
+								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [16777215] }] },
+								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 3, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [3] }] },
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 0.9, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [0.9] }] }
 							]
 						},
 						{
@@ -1836,7 +1816,7 @@
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#FFFFFF",
+							"__smartColor": "#141414",
 							"iid": "16f31ef0-8560-11f0-8ddf-5b7c37ea0692",
 							"width": 32,
 							"height": 32,
@@ -1853,9 +1833,34 @@
 									"id": "V_Bool",
 									"params": [ true ]
 								}] },
-								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [] },
-								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 0, "__tile": null, "defUid": 284, "realEditorValues": [] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [] }
+								{ "__identifier": "textColor", "__type": "Color", "__value": "#141414", "__tile": null, "defUid": 283, "realEditorValues": [] },
+								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 3, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [3] }] },
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 0.8, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [0.8] }] }
+							]
+						},
+						{
+							"__identifier": "TextTrigger",
+							"__grid": [125,51],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#252525",
+							"iid": "0af7ef70-8560-11f0-a158-a5191cc505f8",
+							"width": 32,
+							"height": 32,
+							"defUid": 279,
+							"px": [1004,412],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "Multilines", "__value": "Clover the Cat is an Acrobat.\nHelp Clover eat delicious cl☘️vers to feel safe and strong.\nFind the rare four-leaf cl🍀vers to grow big and long.\n\nA and D to move left and right.\nSpace to jump. (Use your left thumb)", "__tile": null, "defUid": 281, "realEditorValues": [{
+									"id": "V_String",
+									"params": [
+										"Clover the Cat is an Acrobat.\\nHelp Clover eat delicious cl☘️vers to feel safe and strong.\\nFind the rare four-leaf cl🍀vers to grow big and long.\\n\\nA and D to move left and right.\\nSpace to jump. (Use your left thumb)"
+									]
+								}] },
+								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
+								{ "__identifier": "textColor", "__type": "Color", "__value": "#252525", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [2434341] }] },
+								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 3, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [3] }] },
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 0.9, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [0.9] }] }
 							]
 						}
 					]

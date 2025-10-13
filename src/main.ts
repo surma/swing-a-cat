@@ -11,6 +11,8 @@ import stateMachine, {
 import { Action, DEFAULT_KEYMAP, Player } from "./player";
 import * as entities from "./entities";
 
+const KILL_TILES = [19, 20];
+
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
 let level: ReturnType<typeof ldtkLevel>;
@@ -44,13 +46,12 @@ function gameUpdate() {
 
 function checkDeath() {
   const p = Player.SINGLETON;
-  const collisionPoint = e.tileCollisionRaycast(
-    p.pos,
-    p.pos.subtract(vec2(0, 1)),
-  );
-  if (!collisionPoint) return;
-  const tileData = level.layer.getData(collisionPoint);
-  if (tileData.tile == 19) {
+  const killDirections = [vec2(0, 0.51), vec2(0.6, 0), vec2(-0.6, 0)];
+  const hitTiles = killDirections
+    .map((dir) => e.tileCollisionRaycast(p.pos, p.pos.subtract(dir)))
+    .filter((p) => !!p)
+    .map((p) => level.layer.getData(p));
+  if (hitTiles.some((t) => KILL_TILES.includes(t.tile))) {
     p.reset();
     splash.play();
   }

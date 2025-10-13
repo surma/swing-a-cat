@@ -1647,7 +1647,7 @@
 						},
 						{
 							"__identifier": "Spawn",
-							"__grid": [126,52],
+							"__grid": [126,112],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -1656,7 +1656,7 @@
 							"width": 8,
 							"height": 8,
 							"defUid": 113,
-							"px": [1012,420],
+							"px": [1012,900],
 							"fieldInstances": []
 						},
 						{
@@ -1791,23 +1791,23 @@
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#FFFFFF",
+							"__smartColor": "#292929",
 							"iid": "a565c120-8560-11f0-9a68-57b3a2241c58",
 							"width": 32,
 							"height": 32,
 							"defUid": 279,
 							"px": [844,428],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "Multilines", "__value": "Aim and click to make Clover do that thang.\nA and D to make it swang.\nW and S for little and long.\nClick or space to release.", "__tile": null, "defUid": 281, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "Multilines", "__value": "Aim, click, and hold \nto make Clover do that thang.\nA and D to make it swang.\nW and S for little and long.\nRelease click to let go.", "__tile": null, "defUid": 281, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"Aim and click to make Clover do that thang.\\nA and D to make it swang.\\nW and S for little and long.\\nClick or space to release."
+										"Aim, click, and hold \\nto make Clover do that thang.\\nA and D to make it swang.\\nW and S for little and long.\\nRelease click to let go."
 									]
 								}] },
 								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
-								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [16777215] }] },
-								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 3, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [3] }] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 0.9, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [0.9] }] }
+								{ "__identifier": "textColor", "__type": "Color", "__value": "#292929", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [2697513] }] },
+								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 5, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [5] }] },
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [1] }] }
 							]
 						},
 						{
@@ -1816,51 +1816,51 @@
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#141414",
+							"__smartColor": "#292929",
 							"iid": "16f31ef0-8560-11f0-8ddf-5b7c37ea0692",
 							"width": 32,
 							"height": 32,
 							"defUid": 279,
 							"px": [1060,940],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "Multilines", "__value": "🐈‍⬛ Wow, you sure swung that cat!\n🐈 And they had a little snack.\n🍀 Must have been good luck at that.", "__tile": null, "defUid": 281, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "Multilines", "__value": "🐈‍⬛ Wow, you sure swung that cat! 🐈\n🐈 And they had a little snack. 🐈‍⬛\n🍀 Must have been good luck, 🍀\n🍀 and that was that. 🍀", "__tile": null, "defUid": 281, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"🐈‍⬛ Wow, you sure swung that cat!\\n🐈 And they had a little snack.\\n🍀 Must have been good luck at that."
+										"🐈‍⬛ Wow, you sure swung that cat! 🐈\\n🐈 And they had a little snack. 🐈‍⬛\\n🍀 Must have been good luck, 🍀\\n🍀 and that was that. 🍀"
 									]
 								}] },
 								{ "__identifier": "win", "__type": "Bool", "__value": true, "__tile": null, "defUid": 282, "realEditorValues": [{
 									"id": "V_Bool",
 									"params": [ true ]
 								}] },
-								{ "__identifier": "textColor", "__type": "Color", "__value": "#141414", "__tile": null, "defUid": 283, "realEditorValues": [] },
-								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 3, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [3] }] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 0.8, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [0.8] }] }
+								{ "__identifier": "textColor", "__type": "Color", "__value": "#292929", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [2697513] }] },
+								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 5.5, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [5.5] }] },
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [1] }] }
 							]
 						},
 						{
 							"__identifier": "TextTrigger",
-							"__grid": [125,51],
+							"__grid": [126,49],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#252525",
+							"__smartColor": "#292929",
 							"iid": "0af7ef70-8560-11f0-a158-a5191cc505f8",
 							"width": 32,
 							"height": 32,
 							"defUid": 279,
-							"px": [1004,412],
+							"px": [1012,396],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "Multilines", "__value": "Clover the Cat is an Acrobat.\nHelp Clover eat delicious cl☘️vers to feel safe and strong.\nFind the rare four-leaf cl🍀vers to grow big and long.\n\nA and D to move left and right.\nSpace to jump. (Use your left thumb)", "__tile": null, "defUid": 281, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "Multilines", "__value": "Clover the Cat is an Acrobat.\nHelp Clover eat delicious ☘️ clovers ☘️ \nto feel safe and strong.\nFind the rare four-leaf 🍀 clovers 🍀 \nto grow big and long.\n\nA and D to move left and right.\nSpace to jump. (Use your left thumb)", "__tile": null, "defUid": 281, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"Clover the Cat is an Acrobat.\\nHelp Clover eat delicious cl☘️vers to feel safe and strong.\\nFind the rare four-leaf cl🍀vers to grow big and long.\\n\\nA and D to move left and right.\\nSpace to jump. (Use your left thumb)"
+										"Clover the Cat is an Acrobat.\\nHelp Clover eat delicious ☘️ clovers ☘️ \\nto feel safe and strong.\\nFind the rare four-leaf 🍀 clovers 🍀 \\nto grow big and long.\\n\\nA and D to move left and right.\\nSpace to jump. (Use your left thumb)"
 									]
 								}] },
 								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
-								{ "__identifier": "textColor", "__type": "Color", "__value": "#252525", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [2434341] }] },
-								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 3, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [3] }] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 0.9, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [0.9] }] }
+								{ "__identifier": "textColor", "__type": "Color", "__value": "#292929", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [2697513] }] },
+								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 5, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [5] }] },
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [1] }] }
 							]
 						}
 					]

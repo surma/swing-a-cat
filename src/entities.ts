@@ -76,7 +76,7 @@ function fromHex(hex: string): [number, number, number] {
     .slice(1)
     .split(/(..)/)
     .filter(Boolean)
-    .map((v) => parseInt(v, 16));
+    .map((v) => parseInt(v, 16) / 255);
 }
 
 export class TextTrigger extends e.EngineObject {

@@ -1257,7 +1257,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Text_trigger",
+			"identifier": "TextTrigger",
 			"uid": 279,
 			"tags": [],
 			"exportToToc": false,
@@ -1675,7 +1675,7 @@
 							"fieldInstances": []
 						},
 						{
-							"__identifier": "Text_trigger",
+							"__identifier": "TextTrigger",
 							"__grid": [125,51],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -1692,7 +1692,7 @@
 							]
 						},
 						{
-							"__identifier": "Text_trigger",
+							"__identifier": "TextTrigger",
 							"__grid": [106,53],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -1714,7 +1714,7 @@
 							]
 						},
 						{
-							"__identifier": "Text_trigger",
+							"__identifier": "TextTrigger",
 							"__grid": [132,117],
 							"__pivot": [0.5,0.5],
 							"__tags": [],

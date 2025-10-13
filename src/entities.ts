@@ -71,7 +71,7 @@ export class Spawn extends e.EngineObject {
   render() {}
 }
 
-export class Text_trigger extends e.EngineObject {
+export class TextTrigger extends e.EngineObject {
   private triggered = false;
   private text: string;
   constructor(

@@ -1399,7 +1399,7 @@
 					"max": null,
 					"regex": null,
 					"acceptFileTypes": null,
-					"defaultOverride": { "id": "V_Int", "params": [1315860] },
+					"defaultOverride": { "id": "V_Int", "params": [2697513] },
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -1861,6 +1861,29 @@
 								{ "__identifier": "textColor", "__type": "Color", "__value": "#292929", "__tile": null, "defUid": 283, "realEditorValues": [{ "id": "V_Int", "params": [2697513] }] },
 								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 5, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [5] }] },
 								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [{ "id": "V_Float", "params": [1] }] }
+							]
+						},
+						{
+							"__identifier": "TextTrigger",
+							"__grid": [74,52],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#292929",
+							"iid": "18dc1420-8560-11f0-949a-85141e23eb8f",
+							"width": 32,
+							"height": 32,
+							"defUid": 279,
+							"px": [596,420],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "Multilines", "__value": "Beware the water,\nfor Clover has\nan aversion to wets.", "__tile": null, "defUid": 281, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Beware the water,\\nfor Clover has\\nan aversion to wets."]
+								}] },
+								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
+								{ "__identifier": "textColor", "__type": "Color", "__value": "#292929", "__tile": null, "defUid": 283, "realEditorValues": [] },
+								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 4, "__tile": null, "defUid": 284, "realEditorValues": [{ "id": "V_Float", "params": [4] }] },
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [] }
 							]
 						}
 					]

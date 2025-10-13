@@ -71,9 +71,20 @@ export class Spawn extends e.EngineObject {
   render() {}
 }
 
+function fromHex(hex: string): [number, number, number] {
+  return hex
+    .slice(1)
+    .split(/(..)/)
+    .filter(Boolean)
+    .map((v) => parseInt(v, 16));
+}
+
 export class TextTrigger extends e.EngineObject {
   private triggered = false;
   private text: string;
+  private color: e.Color;
+  private verticalOffset: number;
+  private fontSize: number;
   constructor(
     pos: e.Vector2,
     size: e.Vector2,
@@ -81,8 +92,14 @@ export class TextTrigger extends e.EngineObject {
   ) {
     super(pos, size);
     this.mass = 0;
-    this.text =
-      fields.find((f) => (f.__identifier = "text"))?.__value ?? "<missing>";
+    this.text = fields.find((f) => f.__identifier == "text")?.__value;
+    const hexColor = fields.find((f) => f.__identifier == "textColor")?.__value;
+    this.color = new e.Color(...fromHex(hexColor));
+    console.log(this.color, hexColor);
+    this.fontSize = fields.find((f) => f.__identifier == "fontSize")?.__value;
+    this.verticalOffset = fields.find(
+      (f) => f.__identifier == "verticalOffset",
+    )?.__value;
   }
 
   onHit() {
@@ -105,7 +122,12 @@ export class TextTrigger extends e.EngineObject {
 
   render() {
     if (this.triggered) {
-      e.drawText(this.text, this.pos);
+      e.drawText(
+        this.text,
+        this.pos.add(vec2(0, this.verticalOffset)),
+        this.fontSize,
+        this.color,
+      );
     }
   }
 }

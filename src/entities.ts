@@ -95,7 +95,6 @@ export class TextTrigger extends e.EngineObject {
     this.text = fields.find((f) => f.__identifier == "text")?.__value;
     const hexColor = fields.find((f) => f.__identifier == "textColor")?.__value;
     this.color = new e.Color(...fromHex(hexColor));
-    console.log(this.color, hexColor);
     this.fontSize = fields.find((f) => f.__identifier == "fontSize")?.__value;
     this.verticalOffset = fields.find(
       (f) => f.__identifier == "verticalOffset",

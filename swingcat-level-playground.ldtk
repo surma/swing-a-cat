@@ -1802,7 +1802,7 @@
 								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
 								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [] },
 								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 0, "__tile": null, "defUid": 284, "realEditorValues": [] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 16, "__tile": null, "defUid": 285, "realEditorValues": [] }
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [null] }
 							]
 						},
 						{
@@ -1827,7 +1827,7 @@
 								{ "__identifier": "win", "__type": "Bool", "__value": false, "__tile": null, "defUid": 282, "realEditorValues": [] },
 								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [] },
 								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 0, "__tile": null, "defUid": 284, "realEditorValues": [] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 16, "__tile": null, "defUid": 285, "realEditorValues": [] }
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [] }
 							]
 						},
 						{
@@ -1855,7 +1855,7 @@
 								}] },
 								{ "__identifier": "textColor", "__type": "Color", "__value": "#FFFFFF", "__tile": null, "defUid": 283, "realEditorValues": [] },
 								{ "__identifier": "verticalOffset", "__type": "Float", "__value": 0, "__tile": null, "defUid": 284, "realEditorValues": [] },
-								{ "__identifier": "fontSize", "__type": "Float", "__value": 16, "__tile": null, "defUid": 285, "realEditorValues": [] }
+								{ "__identifier": "fontSize", "__type": "Float", "__value": 1, "__tile": null, "defUid": 285, "realEditorValues": [] }
 							]
 						}
 					]

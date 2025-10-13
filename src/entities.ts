@@ -57,13 +57,6 @@ export class Win extends BaseClover {
     this.won = true;
     e.setPaused(true);
   }
-
-  render() {
-    super.render();
-    if (this.won) {
-      e.drawText("YOU SURE SWUNG THAT CAT", Player.SINGLETON.pos);
-    }
-  }
 }
 
 export class Spawn extends e.EngineObject {
@@ -100,9 +93,7 @@ export class TextTrigger extends e.EngineObject {
     this.verticalOffset = fields.find(
       (f) => f.__identifier == "verticalOffset",
     )?.__value;
-    this.font = fields.find(
-      (f) => f.__identifier == "font",
-    )?.__value;
+    this.font = fields.find((f) => f.__identifier == "font")?.__value;
   }
 
   onHit() {
@@ -133,7 +124,7 @@ export class TextTrigger extends e.EngineObject {
         undefined,
         undefined,
         undefined,
-        this.font
+        this.font,
       );
     }
   }

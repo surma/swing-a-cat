@@ -60,6 +60,7 @@ export class Player extends e.EngineObject {
   SPEED: number = 0.12;
   AIR_CONTROL: number = 0.15;
   lastPos: [e.Vector2, e.Vector2];
+  lastMirror: [boolean, boolean] = [false, false];
   animationFrame: number = 0;
   animationTimer: number = 0;
   animationSpeed: number = 0.1;
@@ -78,8 +79,11 @@ export class Player extends e.EngineObject {
     this.initStateMachine();
 
   shouldMirror() {
-    const [prev, now] = this.lastPos;
-    return Math.sign(now.subtract(prev).x);
+    const [prevPos, nowPos] = this.lastPos;
+    const [prevMirror, nowMirror] = this.lastMirror;
+    const mirror = Math.sign(nowPos.subtract(prevPos).x);
+    if (mirror == 0) return nowMirror;
+    return mirror == -1;
   }
 
   updateLastPos() {
@@ -88,7 +92,8 @@ export class Player extends e.EngineObject {
   }
 
   updateMirror() {
-    this.mirror = this.shouldMirror() == -1;
+    this.mirror = this.shouldMirror();
+    this.lastMirror = [this.lastMirror[1], this.mirror];
   }
 
   releaseRope() {

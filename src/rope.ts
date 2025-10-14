@@ -61,7 +61,16 @@ export class Rope extends e.EngineObject {
   }
 
   render(): void {
-    const f = this.p.pos.add(vec2(0.5, 0).scale(this.p.mirror ? 1 : -1));
-    e.drawLine(f, f.lerp(this.end, this.percentDone), 0.1, e.BLACK);
+    const f = this.p.pos.add(
+      vec2(0.4, 0)
+        .scale(this.p.mirror ? 1 : -1)
+        .add(vec2(0, -0.1)),
+    );
+    e.drawLine(
+      f,
+      f.lerp(this.end, this.percentDone),
+      0.1,
+      new e.Color(64 / 255, 54 / 255, 52 / 255),
+    );
   }
 }

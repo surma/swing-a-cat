@@ -82,22 +82,20 @@ export function getEntitiesFromLayer(layer: LayerInstance, entityName: string) {
   return entity;
 }
 
-export function ldtkLevel(
-  name: string,
-  entityList: [{ new (key: string, ...a: any[]): any }],
-) {
-  const level = getLevel(name);
+export function ldtkLevel(name: string, entityList: Record<string, any>) {
+  const level = must(getLevel(name));
   const numTiles = vec2(level.pxWid, level.pxHei).divide(vec2(gridSize));
   const structureLayerDef = getLayerDefinition("Structure");
   const entitiesLayerDef = getLayerDefinition("Entities");
-  const structureLayer = getLayerInstanceFromLevel(
-    level,
-    structureLayerDef.uid,
+  const structureLayer = must(
+    getLayerInstanceFromLevel(level, structureLayerDef.uid),
   );
-  const entitiesLayer = getLayerInstanceFromLevel(level, entitiesLayerDef.uid);
+  const entitiesLayer = must(
+    getLayerInstanceFromLevel(level, entitiesLayerDef.uid),
+  );
 
-  const structureTileset = getTilesetByUid(
-    must(structureLayerDef.tilesetDefUid),
+  const structureTileset = must(
+    getTilesetByUid(must(structureLayerDef.tilesetDefUid)),
   );
 
   const textureIndex = textures.indexOf(structureTileset.relPath);
@@ -116,11 +114,14 @@ export function ldtkLevel(
   }
 
   const entities = entitiesLayer.entityInstances.flatMap((entity) => {
+    const c = entityList[entity.__identifier] ?? e.EngineObject;
+    const obj: e.EngineObject = new c(
+      fromGridToWorld(entity.__grid),
+      vec2(entity.width / gridSize, entity.height / gridSize),
+      entity.fieldInstances,
+    );
     if (!entity.__tile) return [];
     const textureIndex = getTilesetTextureIndexByUid(entity.__tile.tilesetUid);
-    const c =
-      entityList.find((e) => e.key == entity.__identifier) ?? e.EngineObject;
-    const obj: e.EngineObject = new c(fromGridToWorld(entity.__grid), vec2(1));
     obj.tileInfo = new e.TileInfo(
       vec2(entity.__tile.x, entity.__tile.y),
       vec2(gridSize),
@@ -131,23 +132,7 @@ export function ldtkLevel(
   const spawn = getEntityFromLayer(entitiesLayer, "Spawn");
   const spawnPos = fromGridToWorld(spawn.__grid);
 
-  // Process auto-layer tiles if they exist
-  const encodedAUtoLayer = atob(structureLayer?.autoLayerTiles);
-  const decodedAutoLayer = encodedAUtoLayer
-    .split("")
-    .map((_, i) => encodedAUtoLayer.charCodeAt(i));
-  const numAutoLayerTiles = decodedAutoLayer.length / 4;
-  for (let i = 0; i < numAutoLayerTiles; i++) {
-    const autoTile = {
-      px: [
-        decodedAutoLayer[i] * 8,
-        decodedAutoLayer[i + numAutoLayerTiles] * 8,
-      ],
-      src: [
-        decodedAutoLayer[i + 2 * numAutoLayerTiles] * 8,
-        decodedAutoLayer[i + 3 * numAutoLayerTiles] * 8,
-      ],
-    };
+  for (const autoTile of structureLayer.autoLayerTiles) {
     const tilePos = vec2(...autoTile.px)
       .scale(1 / gridSize)
       .floor();
@@ -160,6 +145,13 @@ export function ldtkLevel(
     const tileX = Math.floor(srcX / gridSize);
     const tileY = Math.floor(srcY / gridSize);
     const tileIndex = tileY * structureTileset.__cWid + tileX;
+    if ((autoTile.f & 1) > 0) {
+      data.mirror = !data.mirror;
+    }
+    if ((autoTile.f & 2) > 0) {
+      data.direction = 2;
+      data.mirror = !data.mirror;
+    }
 
     data.tile = tileIndex;
 

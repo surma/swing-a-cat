@@ -4,9 +4,12 @@ import { getTilesetTextureIndexByIdent, gridSize } from "./utils/ldtk";
 import { Maybe } from "./utils/types";
 import stateMachine, { StateMachineInstance } from "./state-machine";
 import { tile, vec2 } from "littlejsengine";
-import { leap, meow, clover } from "./sounds";
+import { leap, meow, clover, splash } from "./sounds";
 import { match } from "./utils/helpers";
 import { remap } from "./utils/littlejsutils";
+import { level } from "./main";
+
+const KILL_TILES = [19, 20];
 
 export const enum Action {
   None,
@@ -30,13 +33,11 @@ interface ExtraStateMethods {
 }
 
 export const DEFAULT_KEYMAP = {
-  [(window.lol ?? "") + "ArrowRight"]: Action.Right,
-  [(window.lol ?? "") + "ArrowLeft"]: Action.Left,
-  [(window.lol ?? "") + "Space"]: Action.Jump,
-  [(window.lol ?? "") + "KeyE"]: Action.Rope,
-  [(window.lol ?? "") + "KeyK"]: Action.Rope,
-  [(window.lol ?? "") + "LeftMouse"]: Action.Rope,
-  [(window.lol ?? "") + "default"]: Action.None,
+  ArrowRight: Action.Right,
+  ArrowLeft: Action.Left,
+  Space: Action.Jump,
+  LeftMousePress: Action.Rope,
+  default: Action.None,
 };
 
 const enum State {
@@ -50,16 +51,23 @@ const enum State {
 export class Player extends e.EngineObject {
   static SINGLETON: Player;
   rope: Rope | null = null;
-  textureIndex = getTilesetTextureIndexByIdent("All_images");
+  textures = Object.fromEntries(
+    ["idle", "jump", "run"].map((id) => [
+      id,
+      getTilesetTextureIndexByIdent(`Cat_${id}`),
+    ]),
+  );
   SPEED: number = 0.12;
   AIR_CONTROL: number = 0.15;
   lastPos: [e.Vector2, e.Vector2];
+  lastMirror: [boolean, boolean] = [false, false];
   animationFrame: number = 0;
   animationTimer: number = 0;
   animationSpeed: number = 0.1;
   totalFrames: number = 4;
   isMoving: boolean = false;
   nextAction: Maybe<Action> = null;
+  spawn: e.Vector2;
 
   ropeAngle: number = 0;
   ropeAngularVelocity: number = 0;
@@ -71,8 +79,11 @@ export class Player extends e.EngineObject {
     this.initStateMachine();
 
   shouldMirror() {
-    const [prev, now] = this.lastPos;
-    return Math.sign(now.subtract(prev).x);
+    const [prevPos, nowPos] = this.lastPos;
+    const [prevMirror, nowMirror] = this.lastMirror;
+    const mirror = Math.sign(nowPos.subtract(prevPos).x);
+    if (mirror == 0) return nowMirror;
+    return mirror == -1;
   }
 
   updateLastPos() {
@@ -81,7 +92,8 @@ export class Player extends e.EngineObject {
   }
 
   updateMirror() {
-    this.mirror = this.shouldMirror() == -1;
+    this.mirror = this.shouldMirror();
+    this.lastMirror = [this.lastMirror[1], this.mirror];
   }
 
   releaseRope() {
@@ -101,13 +113,12 @@ export class Player extends e.EngineObject {
 
   constructor(pos: e.Vector2) {
     super(pos);
+    this.spawn = pos;
 
     this.lastPos = [pos.copy(), pos.copy()];
     this.size = vec2(1, 1);
 
-    // Get Cat tileset texture index and create tile reference
-    const catTextureIndex = getTilesetTextureIndexByIdent("All_images");
-    this.tileInfo = tile(0, vec2(gridSize), catTextureIndex, 1);
+    this.tileInfo = tile(0, vec2(gridSize), this.textures.idle, 1);
 
     this.collideTiles = true;
   }
@@ -124,9 +135,10 @@ export class Player extends e.EngineObject {
     if (!this.isRopeActive) return;
 
     const dir = this.rope!.direction!.normalize();
-    let nextPos = this.pos.add(dir.scale(delta));
-    while (e.tileCollisionTest(nextPos, vec2(1.5))) {
-      nextPos = nextPos.subtract(dir.scale(0.1));
+    const step = dir.scale(delta);
+    let nextPos = this.pos.add(step);
+    if (e.tileCollisionTest(nextPos, vec2(1.5))) {
+      nextPos = nextPos.subtract(step);
     }
 
     this.rope!.length = this.rope!.anchor!.distance(nextPos);
@@ -149,7 +161,7 @@ export class Player extends e.EngineObject {
             if (!p.groundObject) return State.Falling;
 
             p.velocity = vec2(0);
-            p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
+            p.tileInfo = tile(0, vec2(gridSize), p.textures.idle, 1);
 
             p.mirror = action == Action.Left;
             if (action == Action.Left) return State.Walk;
@@ -182,17 +194,17 @@ export class Player extends e.EngineObject {
               p.animationFrame = (p.animationFrame + 1) % p.totalFrames;
             }
             p.tileInfo = tile(
-              15 + p.animationFrame,
+              p.animationFrame,
               vec2(gridSize),
-              p.textureIndex,
-              0,
+              p.textures.run,
+              1,
             );
           },
         },
 
         [State.Jump]: {
           input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
+            return match({ ...DEFAULT_KEYMAP, Space: null }, input);
           },
           enter({ player: p }, action) {
             leap.play();
@@ -204,7 +216,7 @@ export class Player extends e.EngineObject {
         },
         [State.Falling]: {
           input(input): Action {
-            return match(DEFAULT_KEYMAP, input);
+            return match({ ...DEFAULT_KEYMAP, Space: null }, input);
           },
           update({ player: p, update }, action: Action) {
             update();
@@ -213,7 +225,7 @@ export class Player extends e.EngineObject {
             else if (action == Action.Rope && p.isRopeActive) p.releaseRope();
             if (p.groundObject) return State.Idle;
 
-            p.tileInfo = tile(15, vec2(gridSize), p.textureIndex, 0);
+            p.tileInfo = tile(15, vec2(gridSize), p.textures.jump, 1);
 
             const factor = match(
               { [Action.Left]: -1, [Action.Right]: 1, default: 0 },
@@ -239,18 +251,14 @@ export class Player extends e.EngineObject {
             return match(
               {
                 ...DEFAULT_KEYMAP,
-                [(window.lol ?? "") + "ArrowUp"]: Action.ShortenRope,
-                [(window.lol ?? "") + "ArrowDown"]: Action.LengthenRope,
-                [(window.lol ?? "") + "Space"]: Action.Rope,
+                ArrowUp: Action.ShortenRope,
+                ArrowDown: Action.LengthenRope,
+                LeftMouseRelease: Action.Rope,
               },
               input,
             );
           },
           enter({ player: p }, action) {
-            // Changing the length rope by 0 triggeres
-            // the code that makes sure we are not colliding
-            p.changeRope(0);
-
             const ropeVector = p.pos.subtract(p.rope!.anchor!);
             p.ropeAngle = Math.atan2(ropeVector.x, -ropeVector.y);
 
@@ -285,7 +293,8 @@ export class Player extends e.EngineObject {
 
             const oldPos = p.pos.copy();
             p.pos = newPos;
-            const collision = e.tileCollisionTest(p.pos, vec2(1.5));
+            p.checkDeath();
+            const collision = e.tileCollisionTest(p.pos, vec2(1.1));
             if (collision) {
               p.pos = oldPos;
               p.ropeAngularVelocity *= -1;
@@ -302,6 +311,18 @@ export class Player extends e.EngineObject {
     );
   }
 
+  checkDeath() {
+    const killDirections = [vec2(0, 0.7), vec2(0.6, 0), vec2(-0.6, 0)];
+    const hitTiles = killDirections
+      .map((dir) => e.tileCollisionRaycast(this.pos, this.pos.subtract(dir)))
+      .filter((p) => !!p)
+      .map((p) => level.layer.getData(p));
+    const isDead = hitTiles.some((t) => KILL_TILES.includes(t.tile));
+    if (isDead) {
+      this.reset();
+      splash.play();
+    }
+  }
   action(action: Action) {
     this.nextAction = action;
   }
@@ -318,5 +339,12 @@ export class Player extends e.EngineObject {
     if (!this.rope?.hasHit) return;
     const dir = this.pos.subtract(this.rope.anchor!);
     this.pos = this.rope.anchor!.add(dir.normalize().scale(this.rope.length));
+  }
+
+  reset() {
+    this.releaseRope();
+    this.pos = this.spawn.copy();
+    this.velocity = vec2(0);
+    this.stateMachine.setState(State.Idle);
   }
 }

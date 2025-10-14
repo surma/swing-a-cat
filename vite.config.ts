@@ -4,7 +4,7 @@ import closurePlugin from "./closure.plugin";
 import soundPlugin from "./sound.plugin";
 import inlinejsPlugin from "./inlinejs.plugin";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   build: {
     modulePreload: {
       polyfill: false,
@@ -15,23 +15,30 @@ export default defineConfig({
     target: "esnext",
     sourcemap: false,
   },
+  resolve: {
+    alias: {
+      ...(command == "build"
+        ? {
+            littlejsengine: new URL(
+              "./node_modules/littlejsengine/dist/littlejs.esm.min.js",
+              import.meta.url,
+            ).pathname,
+          }
+        : null),
+    },
+  },
   plugins: [
     ldtkLoaderPlugin(),
-    closurePlugin(),
+    // closurePlugin(),
     soundPlugin(),
     inlinejsPlugin(),
   ],
-  resolve: {
-    alias: {
-      littlejsengine: new URL("./littlejs.esm.js", import.meta.url).pathname,
-    },
-  },
   test: {
     browser: {
       enabled: true,
       headless: true,
-      provider: "playwright",
+      provider: "pla)ywright",
       instances: [{ browser: "chromium" }],
     },
   },
-});
+}));

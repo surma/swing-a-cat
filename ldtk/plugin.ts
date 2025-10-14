@@ -31,57 +31,7 @@ function processTextures(content: types.LdtkFile): string[] {
 }
 
 function generateModuleCode(file: types.LdtkFile, imports: string[]): string {
-  const subsetLevel = {
-    defaultGridSize: file.defaultGridSize,
-    defs: {
-      layers: file.defs.layers.map((layer) =>
-        pick(layer, "identifier", "uid", "tilesetDefUid"),
-      ),
-      entities: file.defs.entities.map((entity) =>
-        pick(entity, "uid", "identifier"),
-      ),
-      tilesets: file.defs.tilesets.map((tileset) =>
-        pick(tileset, "uid", "identifier", "relPath", "__cHei", "__cWid"),
-      ),
-    },
-    levels: file.levels.map((level) => ({
-      ...pick(level, "uid", "identifier", "pxWid", "pxHei"),
-      layerInstances: (level.layerInstances ?? []).map((layerInstance) => ({
-        ...pick(layerInstance, "layerDefUid"),
-        // This is the least compressible data structure. Turn the Array of Structs into a struct
-        // of arrays to make gzip happy.
-        autoLayerTiles: btoa(
-          String.fromCodePoint(
-            ...layerInstance.autoLayerTiles
-              .map((tileInstance) => tileInstance.px[0] / 8)
-              .flat(),
-            ...layerInstance.autoLayerTiles
-              .map((tileInstance) => tileInstance.px[1] / 8)
-              .flat(),
-            ...layerInstance.autoLayerTiles
-              .map((tileInstance) => tileInstance.src[0] / 8)
-              .flat(),
-            ...layerInstance.autoLayerTiles
-              .map((tileInstance) => tileInstance.src[1] / 8)
-              .flat(),
-          ),
-        ),
-        entityInstances: layerInstance.entityInstances.map(
-          (entityInstance) => ({
-            ...pick(
-              entityInstance,
-              "defUid",
-              "__grid",
-              "__tile",
-              "__identifier",
-            ),
-          }),
-        ),
-      })),
-    })),
-  };
-
-  let jsonString = JSON.stringify(subsetLevel);
+  let jsonString = JSON.stringify(file);
   // Replace the placeholder strings with actual import references
   for (const idx of imports.keys()) {
     jsonString = jsonString.replace(

@@ -21,6 +21,7 @@ export type StateMachine<D, A, E> = Record<string, State<D, A, E>>;
 export interface StateMachineInstance<D, A, E = {}> {
   get currentState(): State<D, A, E>;
   action(action: A): void;
+  setState(nextStateName: NextStateName<D, A, E>): void;
 }
 export default function stateMachine<D, A, E = {}>(
   desc: StateMachine<D, A, E>,
@@ -40,6 +41,12 @@ export default function stateMachine<D, A, E = {}>(
   }
 
   return {
+    setState(nextStateName: NextStateName<D, A, E>) {
+      if (nextStateName == undefined || nextStateName == null) return;
+      const nextState = desc[nextStateName];
+      if (!nextState) error(`Invalid state name ${nextStateName}`);
+      currentState = nextState;
+    },
     get currentState() {
       return currentState;
     },

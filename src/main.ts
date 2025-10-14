@@ -9,11 +9,11 @@ import stateMachine, {
   StateMachineInstance,
 } from "./state-machine";
 import { Action, DEFAULT_KEYMAP, Player } from "./player";
-import entities from "./entities";
+import * as entities from "./entities";
 
 type State<T, E> = (data: T, input: E) => Maybe<State<T, E>>;
 
-let level: ReturnType<typeof ldtkLevel>;
+export let level: ReturnType<typeof ldtkLevel>;
 
 function gameInit() {
   e.setCameraScale(gridSize * 3);
@@ -22,11 +22,11 @@ function gameInit() {
   e.setGravity(-0.018);
   e.setInputWASDEmulateDirection(true);
 
-  document.body.style.background = "#4b6a8bcb";
+  document.body.style.background = "#89a8bbff";
 
   // Hardcoding this because this call MUST happen before I create a TileLayer
   // (inside ldtkLevel()), and I don't wanna grab the data manually lol.
-  e.initTileCollision(vec2(100, 70));
+  e.initTileCollision(vec2(200, 200));
 
   level = ldtkLevel("Level_1", entities);
   level.layer.collideRaycast = true;
@@ -42,21 +42,6 @@ function gameUpdate() {
   updateCamera();
 }
 
-function checkDeath() {
-  const p = Player.SINGLETON;
-  const collisionPoint = e.tileCollisionRaycast(
-    p.pos,
-    p.pos.subtract(vec2(0, 1)),
-  );
-  if (!collisionPoint) return;
-  const tileData = level.layer.getData(collisionPoint);
-  if (tileData.tile == 13) {
-    p.pos.set(level.spawnPos.x, level.spawnPos.y);
-    p.velocity.set(0, 0);
-    splash.play();
-  }
-}
-
 function updateCamera() {
   const CAMERA_LAG = 0.1;
   const toPlayerVec = Player.SINGLETON.pos.subtract(e.cameraPos);
@@ -68,15 +53,16 @@ function gameUpdatePost() {
   const KEYS = [...Object.keys(DEFAULT_KEYMAP), "ArrowUp", "ArrowDown"];
   for (const key of KEYS) {
     if (e.keyIsDown(key)) {
-      p.action(p.stateMachine.currentState.input(key));
+      const action = p.stateMachine.currentState.input(key);
+      if (action) p.action(action);
     }
   }
 
   if (e.mouseWasPressed(0))
-    p.action(p.stateMachine.currentState.input("LeftMouse"));
-  if (e.mouseWasPressed(2))
-    p.action(p.stateMachine.currentState.input("RightMouse"));
-  checkDeath();
+    p.action(p.stateMachine.currentState.input("LeftMousePress"));
+  if (e.mouseWasReleased(0))
+    p.action(p.stateMachine.currentState.input("LeftMouseRelease"));
+  p.checkDeath();
 }
 
 function gameRender() {}
